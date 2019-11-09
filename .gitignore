@@ -97,3 +97,8 @@ notebooks/checkpoint
 notebooks/valdata
 src/data/FeedTestTrainData.py
 src/data/FeedTrainData.py
+ckpt/
+.gitmessage.txt
+.mycommitmsg.txt
+.vscode/
+*.png

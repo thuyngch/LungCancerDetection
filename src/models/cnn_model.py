@@ -10,12 +10,11 @@ from tflearn.data_preprocessing import ImagePreprocessing
 from tflearn.data_augmentation import ImageAugmentation
 from tflearn.layers.normalization import local_response_normalization
 
-import tensorflow as tf
-
-import pickle
+import numpy as np
 import pandas as pd 
-import numpy as np 
-import h5py
+import tensorflow as tf 
+import pickle, h5py
+from src.models.triplet_loss import batch_all_triplet_loss, batch_hard_triplet_loss
 
 
 class CNNModel(object):
@@ -131,7 +130,6 @@ class CNNModel(object):
 		A CNN network
 
 		if mode is visual: then it returns intermediate layers as well
-
 		"""
 		inp_layer = self.input_layer(X_images, name = 'inpu1')
 		conv_layer_1 = self.convolution_layer(32, 5, 'conv1', 'relu', 'L2') # 50 filters, with size 3
@@ -143,18 +141,16 @@ class CNNModel(object):
 		dropout_layer_1 = self.dropout_layer('dp1', 0.5)
 		softmax_layer  = self.fully_connected_layer(2, 'softmax', 'fl2')
 
-		self.network = regression(self.network, optimizer = 'adam',\
-		 loss = 'categorical_crossentropy', learning_rate = 0.001)
-		
+		self.network = regression(
+			self.network,
+			optimizer = 'adam', 
+			# loss = 'categorical_crossentropy',
+			loss = batch_hard_triplet_loss,
+			learning_rate = 0.001,
+		)
+
 		if mode == 'testtrain':
 			return self.network
+
 		if mode == 'visual':
 			return conv_layer_1, conv_layer_2, conv_layer_3, self.network
-
-
-
-
-
-
-
-	
