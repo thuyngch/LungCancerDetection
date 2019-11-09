@@ -111,7 +111,7 @@ def _get_triplet_mask(labels):
 	return mask
 
 
-def batch_all_triplet_loss(labels, embeddings, margin=1.0, squared=False):
+def batch_all_triplet_loss(embeddings, labels, margin=1.0, squared=False):
 	"""Build the triplet loss over a batch of embeddings.
 	We generate all the valid triplets and average the loss over the positive ones.
 	Args:
@@ -123,6 +123,9 @@ def batch_all_triplet_loss(labels, embeddings, margin=1.0, squared=False):
 	Returns:
 		triplet_loss: scalar tensor containing the triplet loss
 	"""
+	# Get label_index
+	labels = labels[:,1]
+	
 	# Get the pairwise distance matrix
 	pairwise_dist = _pairwise_distances(embeddings, squared=squared)
 
@@ -157,10 +160,11 @@ def batch_all_triplet_loss(labels, embeddings, margin=1.0, squared=False):
 	# Get final mean triplet loss over the positive valid triplets
 	triplet_loss = tf.reduce_sum(triplet_loss) / (num_positive_triplets + 1e-16)
 
-	return triplet_loss, fraction_positive_triplets
+	return triplet_loss
+	# return triplet_loss, fraction_positive_triplets
 
 
-def batch_hard_triplet_loss(labels, embeddings, margin=1.0, squared=False):
+def batch_hard_triplet_loss(embeddings, labels, margin=1.0, squared=False):
 	"""Build the triplet loss over a batch of embeddings.
 	For each anchor, we get the hardest positive and hardest negative to form a triplet.
 	Args:
@@ -172,6 +176,9 @@ def batch_hard_triplet_loss(labels, embeddings, margin=1.0, squared=False):
 	Returns:
 		triplet_loss: scalar tensor containing the triplet loss
 	"""
+	# Get label_index
+	labels = labels[:,1]
+
 	# Get the pairwise distance matrix
 	pairwise_dist = _pairwise_distances(embeddings, squared=squared)
 

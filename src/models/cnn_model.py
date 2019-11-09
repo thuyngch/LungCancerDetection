@@ -102,8 +102,7 @@ class CNNModel(object):
 		 num_units: an integer representing number of units in the layer
 
 		"""
-		self.network = fully_connected(self.network, num_units,\
-		 activation= activation_type, name = name)
+		self.network = fully_connected(self.network, num_units, activation= activation_type, name = name)
 		return self.network
 
 	def dropout_layer(self, name, prob = 0.5):
@@ -139,12 +138,14 @@ class CNNModel(object):
 		mp_layer_2 = self.max_pooling_layer(2, 'mp2')
 		fully_connected_layer_1 = self.fully_connected_layer(512,'relu', 'fl1')
 		dropout_layer_1 = self.dropout_layer('dp1', 0.5)
-		softmax_layer  = self.fully_connected_layer(2, 'softmax', 'fl2')
+		# softmax_layer  = self.fully_connected_layer(2, 'softmax', 'fl2')
+		softmax_layer  = self.fully_connected_layer(2, 'linear', 'fl2')
 
 		self.network = regression(
 			self.network,
 			optimizer = 'adam', 
 			# loss = 'categorical_crossentropy',
+			# loss = batch_all_triplet_loss,
 			loss = batch_hard_triplet_loss,
 			learning_rate = 0.001,
 		)

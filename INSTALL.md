@@ -9,7 +9,7 @@ workon lungcancer
 
 * Clone Git repository:
 ```
-git clone https://github.com/swethasubramanian/LungCancerDetection.git
+git clone https://github.com/thuyngch/LungCancerDetection.git
 cd LungCancerDetection
 ```
 
