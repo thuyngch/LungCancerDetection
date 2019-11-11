@@ -1,22 +1,15 @@
 """
 A script to predict nodules using conv net model and for analysis of results
 """
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import h5py, itertools, pickle, tflearn
+from sklearn.metrics import roc_curve, auc, confusion_matrix
 
-import tflearn
 from cnn_model import CNNModel
 
-import tensorflow as tf
-
-import pickle
-import pandas as pd 
-import numpy as np 
-import h5py
-from sklearn.metrics import roc_curve, auc, confusion_matrix
-import itertools
-
-import matplotlib.pyplot as plt
-
-hdfs_file = 'src/data/test.h5'
 
 def create_mosaic(image, nrows, ncols):
 	"""
@@ -55,11 +48,7 @@ def format_image(image, num_images):
 	return imagex
 
 
-
-def plot_confusion_matrix(cm, classes,
-													normalize=False,
-													title='Confusion matrix',
-													cmap=plt.cm.Purples):
+def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Purples):
 		"""
 		This function prints and plots the confusion matrix.
 		Normalization can be applied by setting `normalize=True`.
@@ -90,6 +79,7 @@ def plot_confusion_matrix(cm, classes,
 		plt.ylabel('True label')
 		plt.xlabel('Predicted label')
 
+
 def load_images(filename):
 	"""
 	Loads images contained in hdfs file
@@ -98,6 +88,7 @@ def load_images(filename):
 	X_test_images = h5f2['X']
 	Y_test_labels = h5f2['Y']
 	return X_test_images, Y_test_labels
+
 
 def plot_predictions(images, filename):
 	"""
@@ -110,6 +101,7 @@ def plot_predictions(images, filename):
 	plt.axis('off')
 	plt.savefig(filename + '.png', bbox_inches='tight')
 
+
 def get_predictions(X_test_images, Y_test_labels):
 	"""
 	Args:
@@ -121,7 +113,6 @@ def get_predictions(X_test_images, Y_test_labels):
 	predictions: probability values for each class 
 	label_predictions: returns predicted classes
 	"""
-
 	## Model definition
 	convnet  = CNNModel()
 	network = convnet.define_network(X_test_images)
@@ -134,6 +125,7 @@ def get_predictions(X_test_images, Y_test_labels):
 	label_predictions = np.zeros_like(predictions)
 	label_predictions[np.arange(len(predictions)), predictions.argmax(1)] = 1
 	return predictions, label_predictions
+
 
 def get_roc_curve(Y_test_labels, predictions):
 	"""
@@ -172,8 +164,8 @@ def get_metrics(Y_test_labels, label_predictions):
 	precision = TP*1.0/(TP+FP)
 	recall = TP*1.0/(TP+FN)
 	specificity = TN*1.0/(TN+FP)
-
 	return precision, recall, specificity, cm
+
 
 def plot_roc_curve(fpr, tpr, roc_auc):
 	"""
@@ -195,6 +187,7 @@ def plot_roc_curve(fpr, tpr, roc_auc):
 
 
 def main():
+	hdfs_file = 'src/data/test.h5'
 	X_test_images, Y_test_labels = load_images(hdfs_file)
 
 	predictions, label_predictions = get_predictions(X_test_images, Y_test_labels)
