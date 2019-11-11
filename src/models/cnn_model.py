@@ -118,7 +118,7 @@ class CNNModel(object):
 		return self.network
 
 
-	def define_network(self, X_images, mode = 'testtrain'):
+	def define_network(self, X_images, num_outputs=2, mode='testtrain'):
 		"""
 		Creates a regression network
 		Args:
@@ -138,15 +138,15 @@ class CNNModel(object):
 		mp_layer_2 = self.max_pooling_layer(2, 'mp2')
 		fully_connected_layer_1 = self.fully_connected_layer(512,'relu', 'fl1')
 		dropout_layer_1 = self.dropout_layer('dp1', 0.5)
-		# softmax_layer  = self.fully_connected_layer(2, 'softmax', 'fl2')
-		softmax_layer  = self.fully_connected_layer(2, 'linear', 'fl2')
+		# softmax_layer  = self.fully_connected_layer(num_outputs, 'softmax', 'fl2')
+		softmax_layer  = self.fully_connected_layer(num_outputs, 'linear', 'fl2')
 
 		self.network = regression(
 			self.network,
 			optimizer = 'adam', 
 			# loss = 'categorical_crossentropy',
-			# loss = batch_all_triplet_loss,
-			loss = batch_hard_triplet_loss,
+			loss = batch_all_triplet_loss,
+			# loss = batch_hard_triplet_loss,
 			learning_rate = 0.001,
 		)
 
