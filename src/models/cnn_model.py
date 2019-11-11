@@ -144,10 +144,10 @@ class CNNModel(object):
 		self.network = regression(
 			self.network,
 			optimizer = 'adam', 
+			learning_rate = 1e-3,
 			# loss = 'categorical_crossentropy',
 			loss = batch_all_triplet_loss,
 			# loss = batch_hard_triplet_loss,
-			learning_rate = 0.001,
 		)
 
 		if mode == 'testtrain':

@@ -31,7 +31,7 @@ model = tflearn.DNN(
 model.fit(
 	X_train_images,
 	Y_train_labels,
-	n_epoch=50,
+	n_epoch=10,
 	shuffle=True,
 	validation_set=(X_val_images, Y_val_labels),
 	show_metric=True,

@@ -111,7 +111,7 @@ def _get_triplet_mask(labels):
 	return mask
 
 
-def batch_all_triplet_loss(embeddings, labels, margin=1.0, squared=False):
+def batch_all_triplet_loss(embeddings, labels, margin=0.1, squared=False):
 	"""Build the triplet loss over a batch of embeddings.
 	We generate all the valid triplets and average the loss over the positive ones.
 	Args:
@@ -161,10 +161,9 @@ def batch_all_triplet_loss(embeddings, labels, margin=1.0, squared=False):
 	triplet_loss = tf.reduce_sum(triplet_loss) / (num_positive_triplets + 1e-16)
 
 	return triplet_loss
-	# return triplet_loss, fraction_positive_triplets
 
 
-def batch_hard_triplet_loss(embeddings, labels, margin=1.0, squared=False):
+def batch_hard_triplet_loss(embeddings, labels, margin=0.1, squared=False):
 	"""Build the triplet loss over a batch of embeddings.
 	For each anchor, we get the hardest positive and hardest negative to form a triplet.
 	Args:
