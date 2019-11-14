@@ -57,9 +57,20 @@ Y_train_labels = h5f['Y']
 
 # Model
 convnet  = CNNModel()
-network = convnet.define_network(X_train_images)
-model = tflearn.DNN(network, tensorboard_verbose=0, checkpoint_path="ckpt/nodule3-classifier.tfl.ckpt")
-model.load("ckpt/nodule3-classifier.tfl")
+network = convnet.define_network(
+	X_train_images, Y_train_labels, num_outputs=4,
+	optimizer='adam', lr=1e-3,
+	use_triplet=True, triplet_hard_mining=True,
+)
+model = tflearn.DNN(
+	network,
+	max_checkpoints=10,
+	tensorboard_verbose=1,
+	checkpoint_path='ckpt/nodule3-classifier.tfl.ckpt',
+	best_checkpoint_path='ckpt/model_best.tfl.ckpt',
+)
+model.load("ckpt/model_best.tfl.ckpt8273")
+# model.load("ckpt/nodule3-classifier.tfl")
 
 # Inference
 preds = model.predict(X_train_images[:,:,:,:])
