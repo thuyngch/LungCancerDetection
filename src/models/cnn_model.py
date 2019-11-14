@@ -118,7 +118,7 @@ class CNNModel(object):
 		return self.network
 
 
-	def define_network(self, X_images, num_outputs=2, mode='testtrain'):
+	def define_network(self, X_images, num_outputs=4, mode='testtrain'):
 		"""
 		Creates a regression network
 		Args:
@@ -146,8 +146,8 @@ class CNNModel(object):
 			optimizer = 'adam', 
 			learning_rate = 1e-3,
 			# loss = 'categorical_crossentropy',
-			loss = batch_all_triplet_loss,
-			# loss = batch_hard_triplet_loss,
+			# loss = batch_all_triplet_loss,
+			loss = batch_hard_triplet_loss,
 		)
 
 		if mode == 'testtrain':

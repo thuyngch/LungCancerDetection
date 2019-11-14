@@ -17,7 +17,7 @@ cd LungCancerDetection
 ```
 pip install numpy cython opencv-python tqdm scikit-image albumentations pandas pylint
 pip install ipython jupyter jupyterlab
-pip install tensorflow==1.13.1 tensorboard==1.13 tensorflow-gpu==1.13.1 tflearn
+pip install tensorflow==1.13.1 tensorboard==1.13 tflearn tensorflow-gpu==1.13.1
 ipython kernel install --user --name=lungcancer
 ```
 
