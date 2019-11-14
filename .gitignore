@@ -98,6 +98,7 @@ notebooks/valdata
 src/data/FeedTestTrainData.py
 src/data/FeedTrainData.py
 ckpt/
+exp/
 .gitmessage.txt
 .mycommitmsg.txt
 .vscode/
