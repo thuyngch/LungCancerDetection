@@ -19,6 +19,7 @@ pip install numpy cython opencv-python tqdm scikit-image albumentations pandas p
 pip install ipython jupyter jupyterlab
 pip install tensorflow==1.13.1 tensorboard==1.13 tflearn tensorflow-gpu==1.13.1
 ipython kernel install --user --name=lungcancer
+python setup.py develop
 ```
 
 * Config the VSCode remember the last commit message:
