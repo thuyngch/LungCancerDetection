@@ -6,3 +6,5 @@
 | Triplet |  All |   0.1  |   2  |   30  |  0.772388 | 0.734043 |   0.954478  |
 | Triplet |  All |   0.1  |   4  |   30  |  0.808118 | 0.776596 |   0.961194  |
 | Triplet |  All |   0.1  |   8  |   30  |  0.781132 | 0.734043 |   0.956716  |
+| Triplet |  All |   0.1  |  16  |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
+| Triplet |  All |   0.1  |  32  |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
