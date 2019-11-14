@@ -41,7 +41,6 @@ model.fit(
 )
 
 model.save("ckpt/nodule3-classifier.tfl")
-print("Network trained and saved as ckpt/nodule3-classifier.tfl!")
 
 h5f.close()
 h5f2.close()
