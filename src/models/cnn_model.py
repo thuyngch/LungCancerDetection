@@ -19,27 +19,17 @@ from src.models.triplet_loss import batch_all_triplet_loss, batch_hard_triplet_l
 
 
 class CNNModel(object):
-	"""
-	Initializes a convolution neural network model for training, prediction, and visualization
-	"""
-	def __init__(self, network = None):
+	def __init__(self, network=None):
 		self.network = network
 		self.model = None
 
 	def preprocessing(self):
-		"""
-		Make sure the data is normalized
-		"""
 		img_prep = ImagePreprocessing()
 		img_prep.add_featurewise_zero_center()
 		img_prep.add_featurewise_stdnorm()
 		return img_prep
 
 	def augmentation(self):
-		"""
-		Create extra synthetic training data by flipping, rotating and blurring the
-		images on our data set.
-		"""
 		img_aug = ImageAugmentation()
 		img_aug.add_random_flip_leftright()
 		img_aug.add_random_rotation(max_angle=25.)
@@ -47,106 +37,60 @@ class CNNModel(object):
 		return img_aug
 
 	def input_layer(self, X_images, name):
-		"""
-		Define Input layer
-		"""
 		img_prep = self.preprocessing()
 		img_aug = self.augmentation()
-		self.network = input_data(
+		return input_data(
 			shape=[None, X_images.shape[1], X_images.shape[2], X_images.shape[3]],
 			data_preprocessing=img_prep,
 			data_augmentation=img_aug,
 			name=name,
 		)
-		return self.network
 
-	def convolution_layer(self, num_filters, filter_size, name, activation_type = 'relu', regularizer = None):
-		"""
-		Creates a 2D-conv layer
+	def convolution_layer(self, x, num_filters, filter_size, name, activation_type = 'relu', regularizer = None):
+		return conv_2d(self.network, num_filters, filter_size, activation=activation_type, regularizer=regularizer, name=name)
 
-		Args:
-		-----
-		num_filters = takes an integer
-		filter_size = takes an integer
-		name = takes a string 
-		activation = takes a string
-		regularizer = 'L1' or 'L2' or None
-		"""
-		self.network = conv_2d(self.network, num_filters,\
-		 filter_size, activation = activation_type, regularizer = regularizer, name = name)
-		return self.network
+	def max_pooling_layer(self, x, kernel_size, name):
+		return max_pool_2d(self.network, kernel_size, name = name)
 
-	def max_pooling_layer(self, kernel_size, name):
-		"""
-		It is common to periodically insert a Pooling layer in-between successive Conv layers 
-		in a ConvNet architecture. Its function is to progressively reduce the spatial size of
-		the representation to reduce the amount of parameters and computation in the 
-		network, and hence to also control overfitting. 
+	def fully_connected_layer(self, x, num_units, activation_type, name):
+		return fully_connected(self.network, num_units, activation= activation_type, name = name)
 
-		args:
-		-----
-		kernel_size: takes an integer
-		name : a str representing name of the layer
-		"""
-		self.network = max_pool_2d(self.network, kernel_size, name = name)
-		return self.network
-
-	def fully_connected_layer(self, num_units, activation_type, name):
-		"""
-		Neurons in a fully connected layer have full connections to all activations in the previous
-		layer, as seen in regular Neural Networks. Their activations can hence be computed with
-		 a matrix multiplication followed by a bias offset. 
-
-		 args:
-		 ------
-		 num_units: an integer representing number of units in the layer
-
-		"""
-		self.network = fully_connected(self.network, num_units, activation= activation_type, name = name)
-		return self.network
-
-	def dropout_layer(self, name, prob = 0.5):
-		"""
-		args
-		------
-		prob = float representing dropout probability
-
-		"""
+	def dropout_layer(self, x, name, prob=0.5):
 		if (prob > 1) or (prob < 0):
 			raise ValueError('Probability values should e between 0 and 1')
-		self.network = dropout(self.network, prob, name = name)
-		return self.network
+		return dropout(self.network, prob, name = name)
 
-	def define_network(self, X_images, Y_targets, num_outputs=2,
-		optimizer='adam', lr=1e-3, use_triplet=False, triplet_hard_mining=False):
+	def define_network(self, X_images, Y_targets,
+					num_outputs=2, optimizer='adam', lr=1e-3,
+					use_triplet=False, triplet_hard_mining=False):
 
-		self.input_layer(X_images, name='input')
-		self.convolution_layer(32, 5, 'conv1', 'relu', 'L2')
-		self.max_pooling_layer(2, 'mp1')
-		self.convolution_layer(64, 5, 'conv2', 'relu', 'L2')
-		self.convolution_layer(64, 3, 'conv3', 'relu', 'L2')
-		self.max_pooling_layer(2, 'mp2')
-		self.fully_connected_layer(512,'relu', 'fl1')
-		self.dropout_layer('dp1', 0.5)
+		x = self.input_layer(X_images, name='input')
+		x = self.convolution_layer(x, 32, 5, 'conv1', 'relu', 'L2')
+		x = self.max_pooling_layer(x, 2, 'mp1')
+		x = self.convolution_layer(x, 64, 5, 'conv2', 'relu', 'L2')
+		x = self.convolution_layer(x, 64, 3, 'conv3', 'relu', 'L2')
+		x = self.max_pooling_layer(x, 2, 'mp2')
+		x = self.fully_connected_layer(x, 512,'relu', 'fl1')
+		x = self.dropout_layer(x, 'dp1', 0.5)
 		placeholder = tf.placeholder(shape=[None, Y_targets.shape[1]], dtype=tf.float32, name="input_label")
 
 		if use_triplet:
-			self.fully_connected_layer(num_outputs, 'linear', 'fl2')
+			x = self.fully_connected_layer(x, num_outputs, 'linear', 'fl2')
 			loss = batch_hard_triplet_loss if triplet_hard_mining else batch_all_triplet_loss
-			self.network = regression(
-				self.network,
+			x = regression(
+				x,
 				optimizer=optimizer, 
 				learning_rate=lr,
 				loss=loss,
 				placeholder=placeholder,
 			)
 		else:
-			self.fully_connected_layer(num_outputs, 'softmax', 'fl2')
-			self.network = regression(
-				self.network,
+			x = self.fully_connected_layer(x, num_outputs, 'softmax', 'fl2')
+			x = regression(
+				x,
 				optimizer=optimizer, 
 				learning_rate=lr,
 				loss='categorical_crossentropy',
 				placeholder=placeholder,
 			)
-		return self.network
+		return x
