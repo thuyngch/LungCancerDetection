@@ -118,8 +118,7 @@ class CNNModel(object):
 		return self.network
 
 	def define_network(self, X_images, Y_targets, num_outputs=2,
-						optimizer='adam', lr=1e-3,
-						use_triplet=False, triplet_hard_mining=False):
+		optimizer='adam', lr=1e-3, use_triplet=False, triplet_hard_mining=False):
 
 		self.input_layer(X_images, name='input')
 		self.convolution_layer(32, 5, 'conv1', 'relu', 'L2')

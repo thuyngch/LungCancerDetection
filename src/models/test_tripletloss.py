@@ -69,7 +69,7 @@ model = tflearn.DNN(
 	checkpoint_path='ckpt/nodule3-classifier.tfl.ckpt',
 	best_checkpoint_path='ckpt/model_best.tfl.ckpt',
 )
-model.load("ckpt/model_best.tfl.ckpt8273")
+model.load("ckpt/model_best.tfl.ckpt")
 # model.load("ckpt/nodule3-classifier.tfl")
 
 # Inference
