@@ -29,7 +29,6 @@ model = tflearn.DNN(
 	max_checkpoints=10,
 	tensorboard_verbose=1,
 	checkpoint_path='ckpt/nodule3-classifier.ckpt',
-	best_checkpoint_path='ckpt/model_best.ckpt',
 )
 model.fit(
 	X_train_images,

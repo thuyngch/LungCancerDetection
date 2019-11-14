@@ -66,10 +66,8 @@ model = tflearn.DNN(
 	network,
 	max_checkpoints=10,
 	tensorboard_verbose=1,
-	checkpoint_path='ckpt/nodule3-classifier.tfl.ckpt',
-	best_checkpoint_path='ckpt/model_best.tfl.ckpt',
+	checkpoint_path='ckpt/nodule3-classifier.ckpt',
 )
-# model.load("ckpt/model_best.ckpt740")
 model.load("ckpt/nodule3-classifier.ckpt")
 
 # Inference
