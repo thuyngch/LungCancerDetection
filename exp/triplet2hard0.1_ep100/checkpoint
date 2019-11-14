@@ -1,2 +1,0 @@
-model_checkpoint_path: "/home/thuync/thuync/LungCancerDetection/ckpt/nodule3-classifier.tfl"
-all_model_checkpoint_paths: "/home/thuync/thuync/LungCancerDetection/ckpt/nodule3-classifier.tfl"
