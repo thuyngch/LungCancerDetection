@@ -9,6 +9,6 @@
 | Triplet |  All |   0.1  |  16  |   30  |  0.803846 | 0.741135 |   0.961940  |
 | Triplet |  All |   0.1  |  32  |   30  |  0.816479 | 0.773050 |   0.963433  |
 | Triplet |  All |   0.1  |  64  |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
-| Triplet |  All |   0.1  | 128  |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
-| Triplet |  All |   0.1  | 256  |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
-| Triplet |  All |   0.1  | 512  |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
+| Triplet |  All |   0.1  |  128 |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
+| Triplet |  All |   0.1  |  256 |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
+| Triplet |  All |   0.1  |  512 |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |

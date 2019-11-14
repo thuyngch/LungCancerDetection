@@ -20,7 +20,7 @@ Y_val_labels = h5f2['Y']
 ## Model definition
 convnet  = CNNModel()
 network = convnet.define_network(
-	X_train_images, Y_train_labels, num_outputs=128,
+	X_train_images, Y_train_labels, num_outputs=256,
 	optimizer='adam', lr=1e-3,
 	use_triplet=True, triplet_hard_mining=False,
 )

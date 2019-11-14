@@ -9,6 +9,7 @@ workon lungcancer
 
 * Clone Git repository:
 ```
+thuync
 git clone https://github.com/thuyngch/LungCancerDetection.git
 cd LungCancerDetection
 ```
@@ -17,7 +18,7 @@ cd LungCancerDetection
 ```
 pip install numpy cython opencv-python tqdm scikit-image albumentations pandas pylint sklearn
 pip install ipython jupyter jupyterlab
-pip install tensorflow==1.13.1 tensorboard==1.13 tflearn tensorflow-gpu==1.13.1
+pip install tensorflow==1.13.1 tensorboard==1.13 tflearn # tensorflow-gpu==1.13.1
 ipython kernel install --user --name=lungcancer
 python setup.py develop
 ```
