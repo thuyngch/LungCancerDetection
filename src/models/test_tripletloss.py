@@ -58,7 +58,7 @@ Y_train_labels = h5f['Y']
 # Model
 convnet  = CNNModel()
 network = convnet.define_network(
-	X_train_images, Y_train_labels, num_outputs=8,
+	X_train_images, Y_train_labels, num_outputs=4,
 	optimizer='adam', lr=1e-3,
 	use_triplet=True, triplet_hard_mining=False,
 )
