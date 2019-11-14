@@ -8,7 +8,7 @@
 | Triplet |  All |   0.1  |   8  |   30  |  0.781132 | 0.734043 |   0.956716  |
 | Triplet |  All |   0.1  |  16  |   30  |  0.803846 | 0.741135 |   0.961940  |
 | Triplet |  All |   0.1  |  32  |   30  |  0.816479 | 0.773050 |   0.963433  |
-| Triplet |  All |   0.1  |  64  |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
-| Triplet |  All |   0.1  |  128 |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
-| Triplet |  All |   0.1  |  256 |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
+| Triplet |  All |   0.1  |  64  |   30  |  0.794118 | 0.765957 |   0.958209  |
+| Triplet |  All |   0.1  |  128 |   30  |  0.760714 | 0.755319 |   0.950000  |
+| Triplet |  All |   0.1  |  256 |   30  |  0.798419 | 0.716312 |   0.961940  |
 | Triplet |  All |   0.1  |  512 |   30  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |

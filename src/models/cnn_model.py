@@ -19,8 +19,7 @@ from src.models.triplet_loss import batch_all_triplet_loss, batch_hard_triplet_l
 
 
 class CNNModel(object):
-	def __init__(self, network=None):
-		self.network = network
+	def __init__(self):
 		self.model = None
 
 	def preprocessing(self):
@@ -47,18 +46,18 @@ class CNNModel(object):
 		)
 
 	def convolution_layer(self, x, num_filters, filter_size, name, activation_type = 'relu', regularizer = None):
-		return conv_2d(self.network, num_filters, filter_size, activation=activation_type, regularizer=regularizer, name=name)
+		return conv_2d(x, num_filters, filter_size, activation=activation_type, regularizer=regularizer, name=name)
 
 	def max_pooling_layer(self, x, kernel_size, name):
-		return max_pool_2d(self.network, kernel_size, name = name)
+		return max_pool_2d(x, kernel_size, name = name)
 
 	def fully_connected_layer(self, x, num_units, activation_type, name):
-		return fully_connected(self.network, num_units, activation= activation_type, name = name)
+		return fully_connected(x, num_units, activation= activation_type, name = name)
 
 	def dropout_layer(self, x, name, prob=0.5):
 		if (prob > 1) or (prob < 0):
 			raise ValueError('Probability values should e between 0 and 1')
-		return dropout(self.network, prob, name = name)
+		return dropout(x, prob, name = name)
 
 	def define_network(self, X_images, Y_targets,
 					num_outputs=2, optimizer='adam', lr=1e-3,
