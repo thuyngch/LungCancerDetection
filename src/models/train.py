@@ -31,7 +31,7 @@ model = tflearn.DNN(
 model.fit(
 	X_train_images,
 	Y_train_labels,
-	n_epoch=10,
+	n_epoch=100,
 	shuffle=True,
 	validation_set=(X_val_images, Y_val_labels),
 	show_metric=True,
@@ -41,7 +41,7 @@ model.fit(
 )
 
 model.save("ckpt/nodule3-classifier.tfl")
-print("Network trained and saved as ckpt/nodule2-classifier.tfl!")
+print("Network trained and saved as ckpt/nodule3-classifier.tfl!")
 
 h5f.close()
 h5f2.close()

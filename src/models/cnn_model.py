@@ -146,8 +146,8 @@ class CNNModel(object):
 			optimizer = 'adam', 
 			learning_rate = 1e-3,
 			# loss = 'categorical_crossentropy',
-			loss = batch_all_triplet_loss,
-			# loss = batch_hard_triplet_loss,
+			# loss = batch_all_triplet_loss,
+			loss = batch_hard_triplet_loss,
 		)
 
 		if mode == 'testtrain':
