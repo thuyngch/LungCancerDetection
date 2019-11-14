@@ -20,14 +20,18 @@ Y_val_labels = h5f2['Y']
 
 ## Model definition
 convnet  = CNNModel()
-network = convnet.define_network(X_train_images, num_outputs=2)
-
+network = convnet.define_network(
+	X_train_images, Y_train_labels, num_outputs=4,
+	optimizer='adam', lr=1e-3,
+	use_triplet=True, triplet_hard_mining=True,
+)
 model = tflearn.DNN(
 	network,
-	tensorboard_verbose=0,
+	max_checkpoints=10,
+	tensorboard_verbose=1,
 	checkpoint_path='ckpt/nodule3-classifier.tfl.ckpt',
+	best_checkpoint_path='ckpt/model_best.tfl.ckpt',
 )
-
 model.fit(
 	X_train_images,
 	Y_train_labels,
@@ -36,11 +40,9 @@ model.fit(
 	validation_set=(X_val_images, Y_val_labels),
 	show_metric=True,
 	batch_size=512,
-	snapshot_epoch=True,
+	snapshot_epoch=False,
 	run_id='nodule3-classifier',
 )
-
 model.save("ckpt/nodule3-classifier.tfl")
-
 h5f.close()
 h5f2.close()

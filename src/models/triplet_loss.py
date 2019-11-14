@@ -155,11 +155,9 @@ def batch_all_triplet_loss(embeddings, labels, margin=0.1, squared=False):
 	valid_triplets = tf.to_float(tf.greater(triplet_loss, 1e-16))
 	num_positive_triplets = tf.reduce_sum(valid_triplets)
 	num_valid_triplets = tf.reduce_sum(mask)
-	fraction_positive_triplets = num_positive_triplets / (num_valid_triplets + 1e-16)
 
 	# Get final mean triplet loss over the positive valid triplets
 	triplet_loss = tf.reduce_sum(triplet_loss) / (num_positive_triplets + 1e-16)
-
 	return triplet_loss
 
 
@@ -211,5 +209,4 @@ def batch_hard_triplet_loss(embeddings, labels, margin=0.1, squared=False):
 
 	# Get final mean triplet loss
 	triplet_loss = tf.reduce_mean(triplet_loss)
-
 	return triplet_loss
