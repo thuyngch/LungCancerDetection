@@ -66,9 +66,9 @@ model = tflearn.DNN(
 	network,
 	max_checkpoints=10,
 	tensorboard_verbose=1,
-	checkpoint_path='ckpt/nodule3-classifier.ckpt',
+	checkpoint_path='exp/triplet512all0.1_ep30/nodule3-classifier.ckpt',
 )
-model.load("ckpt/nodule3-classifier.ckpt")
+model.load("exp/triplet512all0.1_ep30/nodule3-classifier.ckpt")
 
 # Inference
 preds = model.predict(X_train_images[:,:,:,:])
