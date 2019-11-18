@@ -106,4 +106,37 @@ class CNNModel(object):
 				loss='categorical_crossentropy',
 				placeholder=placeholder,
 			)
+		print("[{}] Build model with attention: {}".format(self.__class__.__name__, use_attention))
+		print("[{}] Build model with TripletLoss: {}; HardMining: {}".format(self.__class__.__name__, use_triplet, triplet_hard_mining))
 		return x
+
+
+#------------------------------------------------------------------------------
+#  Test bench
+#------------------------------------------------------------------------------
+if __name__ == "__main__":
+	# Libraries
+	import h5py
+
+	# Build dataset
+	h5f = h5py.File('src/data/train.h5', 'r')
+	X_train_images = h5f['X']
+	Y_train_labels = h5f['Y']
+
+	h5f2 = h5py.File('src/data/val.h5', 'r')
+	X_val_images = h5f2['X']
+	Y_val_labels = h5f2['Y']
+
+	# Build model
+	convnet  = CNNModel()
+	network = convnet.define_network(
+		X_train_images, Y_train_labels, num_outputs=512,
+		optimizer='adam', lr=1e-3, use_attention=True,
+		use_triplet=True, triplet_hard_mining=False,
+	)
+	model = tflearn.DNN(
+		network,
+		max_checkpoints=10,
+		tensorboard_verbose=1,
+		checkpoint_path='ckpt/nodule3-classifier.ckpt',
+	)
