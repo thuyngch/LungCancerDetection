@@ -132,7 +132,7 @@ if __name__ == "__main__":
 	network = convnet.define_network(
 		X_train_images, Y_train_labels, num_outputs=512,
 		optimizer='adam', lr=1e-3, use_attention=True,
-		use_triplet=True, triplet_hard_mining=False,
+		use_triplet=False, triplet_hard_mining=False,
 	)
 	model = tflearn.DNN(
 		network,
