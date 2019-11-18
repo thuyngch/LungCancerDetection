@@ -1,5 +1,8 @@
 # EXPERIMENTS
 
+
+## TripletLoss Benchmark
+
 |   Loss  | Type | Margin | Size | Epoch | Precision |  Recall  | Specificity |
 |:-------:|:----:|:------:|:----:|:-----:|:---------:|:--------:|:-----------:|
 | Triplet | Hard |   0.1  |   2  |   30  |  0.174101 | 0.429078 |   0.571642  |
