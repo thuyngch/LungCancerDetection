@@ -11,10 +11,13 @@ from src.models.cnn_model import CNNModel
 #------------------------------------------------------------------------------
 train_data = "src/data/train.h5"
 valid_data = "src/data/val.h5"
-ckpt = "ckpt/attention_softmax/nodule3-classifier.ckpt"
+ckpt = "ckpt/attention0.5_softmax_bs8/nodule3-classifier.ckpt"
 os.makedirs(os.path.dirname(ckpt), exist_ok=True)
 
-use_attention = True
+lr = 5e-4
+epochs = 100
+batch_size = 8
+attention_ratio = 0.5
 use_triplet = False
 triplet_hard_mining = False
 
@@ -36,8 +39,8 @@ if __name__ == "__main__":
 	# Model definition
 	convnet  = CNNModel()
 	network = convnet.define_network(
-		X_train_images, Y_train_labels, num_outputs=2, optimizer='adam', lr=1e-3,
-		use_attention=use_attention, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
+		X_train_images, Y_train_labels, num_outputs=2, optimizer='adam', lr=lr,
+		attention_ratio=attention_ratio, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
 	model = tflearn.DNN(network)
 
@@ -45,11 +48,11 @@ if __name__ == "__main__":
 	model.fit(
 		X_train_images,
 		Y_train_labels,
-		n_epoch=50,
+		n_epoch=epochs,
 		shuffle=True,
 		validation_set=(X_val_images, Y_val_labels),
 		show_metric=True,
-		batch_size=64,
+		batch_size=batch_size,
 		snapshot_epoch=True,
 		run_id='nodule3-classifier',
 	)

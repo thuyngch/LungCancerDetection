@@ -185,8 +185,8 @@ def plot_roc_curve(fpr, tpr, roc_auc):
 def main():
 	# Define
 	hdfs_file = 'src/data/test.h5'
-	ckpt = "ckpt/attention_softmax/nodule3-classifier.ckpt"
-	use_attention = True
+	ckpt = "ckpt/attention_softmax_bs8/nodule3-classifier.ckpt"
+	attention_ratio = 0
 	use_triplet = False
 	triplet_hard_mining = False
 
@@ -195,8 +195,11 @@ def main():
 
 	# Build model
 	convnet  = CNNModel()
-	network = convnet.define_network(X_test_images, Y_test_labels)
-	model = tflearn.DNN(network, tensorboard_verbose=0)
+	network = convnet.define_network(
+		X_test_images, Y_test_labels, num_outputs=2, optimizer='adam', lr=1e-3,
+		attention_ratio=attention_ratio, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
+	)
+	model = tflearn.DNN(network)
 	model.load(ckpt)
 
 	# Model prediction

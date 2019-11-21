@@ -75,13 +75,13 @@ class CNNModel(object):
 		return dropout(x, prob, name = name)
 
 	def define_network(self, X_images, Y_targets, num_outputs=2, optimizer='adam', lr=1e-3,
-						use_attention=False, use_triplet=False, triplet_hard_mining=False):
+						attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
 
 		x = self.input_layer(X_images, name='input')
-		x = self.convolution_layer(x, 32, 5, 'conv1', 'relu', 'L2')
+		x = self.convolution_layer(x, 32, 5, 'conv1', 'relu', 'L2', attention_ratio=attention_ratio)
 		x = self.max_pooling_layer(x, 2, 'mp1')
-		x = self.convolution_layer(x, 64, 5, 'conv2', 'relu', 'L2')
-		x = self.convolution_layer(x, 64, 3, 'conv3', 'relu', 'L2')
+		x = self.convolution_layer(x, 64, 5, 'conv2', 'relu', 'L2', attention_ratio=attention_ratio)
+		x = self.convolution_layer(x, 64, 3, 'conv3', 'relu', 'L2', attention_ratio=attention_ratio)
 		x = self.max_pooling_layer(x, 2, 'mp2')
 		x = self.fully_connected_layer(x, 512,'relu', 'fl1')
 		x = self.dropout_layer(x, 'dp1', 0.5)
@@ -106,7 +106,7 @@ class CNNModel(object):
 				loss='categorical_crossentropy',
 				placeholder=placeholder,
 			)
-		print("[{}] Build model with attention: {}".format(self.__class__.__name__, use_attention))
+		print("[{}] Build model with attention_ratio: {}".format(self.__class__.__name__, attention_ratio))
 		print("[{}] Build model with TripletLoss: {}; HardMining: {}".format(self.__class__.__name__, use_triplet, triplet_hard_mining))
 		return x
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
 	convnet  = CNNModel()
 	network = convnet.define_network(
 		X_train_images, Y_train_labels, num_outputs=512,
-		optimizer='adam', lr=1e-3, use_attention=True,
+		optimizer='adam', lr=1e-3, attention_ratio=0,
 		use_triplet=False, triplet_hard_mining=False,
 	)
 	model = tflearn.DNN(
