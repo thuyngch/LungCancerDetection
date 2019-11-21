@@ -185,8 +185,8 @@ def plot_roc_curve(fpr, tpr, roc_auc):
 def main():
 	# Define
 	hdfs_file = 'src/data/test.h5'
-	ckpt = "ckpt/attention_softmax_bs8/nodule3-classifier.ckpt"
-	attention_ratio = 0
+	ckpt = "ckpt/attention0.5_softmax_bs8/nodule3-classifier.ckpt"
+	attention_ratio = 0.5
 	use_triplet = False
 	triplet_hard_mining = False
 
