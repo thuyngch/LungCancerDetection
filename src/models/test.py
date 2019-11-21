@@ -16,7 +16,6 @@ import itertools
 
 import matplotlib.pyplot as plt
 
-hdfs_file = 'src/data/test.h5'
 
 def create_mosaic(image, nrows, ncols):
 	"""
@@ -107,7 +106,7 @@ def plot_predictions(images, filename):
 	plt.axis('off')
 	plt.savefig(filename + '.png', bbox_inches='tight')
 
-def get_predictions(X_test_images, Y_test_labels):
+def get_predictions(model, X_test_images, Y_test_labels):
 	"""
 	Args:
 	------
@@ -118,16 +117,7 @@ def get_predictions(X_test_images, Y_test_labels):
 	predictions: probability values for each class 
 	label_predictions: returns predicted classes
 	"""
-
-	## Model definition
-	convnet  = CNNModel()
-	network = convnet.define_network(X_test_images)
-	model = tflearn.DNN(network, tensorboard_verbose=0, checkpoint_path='ckpt/nodule3-classifier.tfl.ckpt')
-	model.load("ckpt/nodule3-classifier.tfl")
-
 	predictions = np.vstack(model.predict(X_test_images[:,:,:,:]))
-	#label_predictions = np.vstack(model.predict_label(X_test_images[:,:,:,:]))
-	score = model.evaluate(X_test_images, Y_test_labels)
 	label_predictions = np.zeros_like(predictions)
 	label_predictions[np.arange(len(predictions)), predictions.argmax(1)] = 1
 	return predictions, label_predictions
@@ -193,18 +183,34 @@ def plot_roc_curve(fpr, tpr, roc_auc):
 
 
 def main():
+	# Define
+	hdfs_file = 'src/data/test.h5'
+	ckpt = "ckpt/attention_softmax/nodule3-classifier.ckpt"
+	use_attention = True
+	use_triplet = False
+	triplet_hard_mining = False
+
+	# Load data
 	X_test_images, Y_test_labels = load_images(hdfs_file)
 
-	predictions, label_predictions = get_predictions(X_test_images, Y_test_labels)
+	# Build model
+	convnet  = CNNModel()
+	network = convnet.define_network(X_test_images, Y_test_labels)
+	model = tflearn.DNN(network, tensorboard_verbose=0)
+	model.load(ckpt)
 
-	fpr, tpr, roc_auc = get_roc_curve(Y_test_labels, predictions)
-	plot_roc_curve(fpr, tpr, roc_auc)
+	# Model prediction
+	predictions, label_predictions = get_predictions(model, X_test_images, Y_test_labels)
 
+	# Get metrics
 	precision, recall, specificity, cm = get_metrics(Y_test_labels, label_predictions)
-
 	print("precision:", precision)
 	print("recall:", recall)
 	print("specificity:", specificity)
+
+	# # Get ROC
+	# fpr, tpr, roc_auc = get_roc_curve(Y_test_labels, predictions)
+	# plot_roc_curve(fpr, tpr, roc_auc)
 
 	# # Plot non-normalized confusion matrix
 	# plt.figure()

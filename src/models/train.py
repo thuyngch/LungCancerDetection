@@ -1,46 +1,60 @@
-"""
-Trains a CNN model using tflearn wrapper for tensorflow
-"""
-
+#------------------------------------------------------------------------------
+#  Libraries
+#------------------------------------------------------------------------------
 import numpy as np
-import tflearn, h5py
-from src.models.cnn_model import CNNModel 
+import tflearn, h5py, os
+from src.models.cnn_model import CNNModel
 
 
-# Load HDF5 dataset
-h5f = h5py.File('src/data/train.h5', 'r')
-X_train_images = h5f['X']
-Y_train_labels = h5f['Y']
+#------------------------------------------------------------------------------
+#  Arguments
+#------------------------------------------------------------------------------
+train_data = "src/data/train.h5"
+valid_data = "src/data/val.h5"
+ckpt = "ckpt/attention_softmax/nodule3-classifier.ckpt"
+os.makedirs(os.path.dirname(ckpt), exist_ok=True)
 
-h5f2 = h5py.File('src/data/val.h5', 'r')
-X_val_images = h5f2['X']
-Y_val_labels = h5f2['Y']
+use_attention = True
+use_triplet = False
+triplet_hard_mining = False
 
 
-## Model definition
-convnet  = CNNModel()
-network = convnet.define_network(
-	X_train_images, Y_train_labels, num_outputs=512,
-	optimizer='adam', lr=1e-3,
-	use_triplet=True, triplet_hard_mining=False,
-)
-model = tflearn.DNN(
-	network,
-	max_checkpoints=10,
-	tensorboard_verbose=1,
-	checkpoint_path='ckpt/nodule3-classifier.ckpt',
-)
-model.fit(
-	X_train_images,
-	Y_train_labels,
-	n_epoch=30,
-	shuffle=True,
-	validation_set=(X_val_images, Y_val_labels),
-	show_metric=True,
-	batch_size=512,
-	snapshot_epoch=False,
-	run_id='nodule3-classifier',
-)
-model.save("ckpt/nodule3-classifier.ckpt")
-h5f.close()
-h5f2.close()
+#------------------------------------------------------------------------------
+#  Main execution
+#------------------------------------------------------------------------------
+if __name__ == "__main__":
+
+	# Load HDF5 dataset
+	h5f = h5py.File(train_data, 'r')
+	X_train_images = h5f['X']
+	Y_train_labels = h5f['Y']
+
+	h5f2 = h5py.File(valid_data, 'r')
+	X_val_images = h5f2['X']
+	Y_val_labels = h5f2['Y']
+
+	# Model definition
+	convnet  = CNNModel()
+	network = convnet.define_network(
+		X_train_images, Y_train_labels, num_outputs=2, optimizer='adam', lr=1e-3,
+		use_attention=use_attention, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
+	)
+	model = tflearn.DNN(network)
+
+	# Training and validating
+	model.fit(
+		X_train_images,
+		Y_train_labels,
+		n_epoch=50,
+		shuffle=True,
+		validation_set=(X_val_images, Y_val_labels),
+		show_metric=True,
+		batch_size=64,
+		snapshot_epoch=True,
+		run_id='nodule3-classifier',
+	)
+
+	# Save checkpoint
+	model.save(ckpt)
+	h5f.close()
+	h5f2.close()
