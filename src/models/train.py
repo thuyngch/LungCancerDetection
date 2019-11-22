@@ -2,24 +2,51 @@
 #  Libraries
 #------------------------------------------------------------------------------
 import numpy as np
-import tflearn, h5py, os
+import tflearn, h5py, os, argparse
 from src.models.cnn_model import CNNModel
 
 
 #------------------------------------------------------------------------------
 #  Arguments
 #------------------------------------------------------------------------------
-train_data = "src/data/train.h5"
-valid_data = "src/data/val.h5"
-ckpt = "ckpt/attention0.5_softmax_bs8/nodule3-classifier.ckpt"
+# Argument parser
+parser = argparse.ArgumentParser(description='Train model')
+
+parser.add_argument('--train_data', type=str, default='src/data/train.h5', help='Training data h5-file')
+
+parser.add_argument('--valid_data', type=str, default='src/data/val.h5', help='Validating data h5-file')
+
+parser.add_argument('--ckpt', type=str, default='ckpt/attention0.5_softmax_bs8/nodule3-classifier.ckpt', help='Checkpoint path')
+
+parser.add_argument('--num_outputs', type=int, default=2, help='Number of outputs')
+
+parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
+
+parser.add_argument('--epoch', type=int, default=50, help='Number of epochs')
+
+parser.add_argument('--batch_size', type=int, default=8, help='Batch size')
+
+parser.add_argument('--attention_ratio', type=float, default=0.0, help='Attention ratio')
+
+parser.add_argument('--use_triplet', action='store_true', default=False, help='Use triplet loss instead of CE loss')
+
+parser.add_argument('--triplet_hard_mining', action='store_true', default=False, help='Batch-hard triplet loss')
+
+args = parser.parse_args()
+
+# Take arguments
+train_data = args.train_data
+valid_data = args.valid_data
+ckpt = args.ckpt
 os.makedirs(os.path.dirname(ckpt), exist_ok=True)
 
-lr = 5e-4
-epochs = 100
-batch_size = 8
-attention_ratio = 0.5
-use_triplet = False
-triplet_hard_mining = False
+num_outputs = args.num_outputs
+lr = args.lr
+epochs = args.epoch
+batch_size = args.batch_size
+attention_ratio = args.attention_ratio
+use_triplet = args.use_triplet
+triplet_hard_mining = args.triplet_hard_mining
 
 
 #------------------------------------------------------------------------------
@@ -39,7 +66,7 @@ if __name__ == "__main__":
 	# Model definition
 	convnet  = CNNModel()
 	network = convnet.define_network(
-		X_train_images, Y_train_labels, num_outputs=2, optimizer='adam', lr=lr,
+		X_train_images, Y_train_labels, num_outputs=num_outputs, optimizer='adam', lr=lr,
 		attention_ratio=attention_ratio, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
 	model = tflearn.DNN(network)

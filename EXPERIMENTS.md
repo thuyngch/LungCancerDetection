@@ -24,4 +24,7 @@
 | Softmax |  0.0  |   32  |  100  |  0.863071 | 0.737589 |   0.975373  |
 | Softmax |  0.0  |   16  |  100  |  0.883333 | 0.751773 |   0.979104  |
 | Softmax |  0.0  |   8   |  100  |  0.919283 | 0.726950 |   0.986567  |
-| Softmax |  0.5  |   8   |  100  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
+| Softmax |  0.25 |   8   |  100  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
+| Softmax |  0.5  |   8   |  100  |  0.875000 | 0.744681 |   0.977612  |
+| Softmax |  0.75 |   8   |  100  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
+| Softmax |  1.0  |   8   |  100  |  xxxxxxxx | xxxxxxxx |   xxxxxxxx  |
