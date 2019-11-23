@@ -188,6 +188,8 @@ parser.add_argument('--num_outputs', type=int, default=2, help='Number of output
 
 parser.add_argument('--attention_ratio', type=float, default=0.0, help='Attention ratio')
 
+parser.add_argument('--use_pooling', action='store_true', default=False, help='Use max pooling')
+
 parser.add_argument('--use_triplet', action='store_true', default=False, help='Use triplet loss instead of CE loss')
 
 parser.add_argument('--triplet_hard_mining', action='store_true', default=False, help='Batch-hard triplet loss')
@@ -201,6 +203,7 @@ os.makedirs(os.path.dirname(ckpt), exist_ok=True)
 
 num_outputs = args.num_outputs
 attention_ratio = args.attention_ratio
+use_pooling = args.use_pooling
 use_triplet = args.use_triplet
 triplet_hard_mining = args.triplet_hard_mining
 
@@ -216,8 +219,8 @@ if __name__ == "__main__":
 	convnet  = CNNModel()
 	network = convnet.define_network(
 		X_test_images, Y_test_labels, num_outputs=num_outputs,
-		attention_ratio=attention_ratio, use_triplet=use_triplet,
-		triplet_hard_mining=triplet_hard_mining,
+		use_pooling=use_pooling, attention_ratio=attention_ratio,
+		use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
 	model = tflearn.DNN(network)
 

@@ -47,6 +47,7 @@ lr = args.lr
 epochs = args.epoch
 batch_size = args.batch_size
 attention_ratio = args.attention_ratio
+use_pooling = args.use_pooling
 use_triplet = args.use_triplet
 triplet_hard_mining = args.triplet_hard_mining
 
