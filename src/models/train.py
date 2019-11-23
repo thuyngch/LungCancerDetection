@@ -28,6 +28,8 @@ parser.add_argument('--batch_size', type=int, default=8, help='Batch size')
 
 parser.add_argument('--attention_ratio', type=float, default=0.0, help='Attention ratio')
 
+parser.add_argument('--use_pooling', action='store_true', default=False, help='Use max pooling')
+
 parser.add_argument('--use_triplet', action='store_true', default=False, help='Use triplet loss instead of CE loss')
 
 parser.add_argument('--triplet_hard_mining', action='store_true', default=False, help='Batch-hard triplet loss')
@@ -66,7 +68,7 @@ if __name__ == "__main__":
 	# Model definition
 	convnet  = CNNModel()
 	network = convnet.define_network(
-		X_train_images, Y_train_labels, num_outputs=num_outputs, optimizer='adam', lr=lr,
+		X_train_images, Y_train_labels, num_outputs=num_outputs, optimizer='adam', lr=lr, use_pooling=use_pooling,
 		attention_ratio=attention_ratio, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
 	model = tflearn.DNN(network, best_checkpoint_path=ckpt, max_checkpoints=1)

@@ -59,10 +59,15 @@ class CNNModel(object):
 		scale = x * excitation
 		return scale
 
-	def convolution_layer(self, x, num_filters, filter_size, name, activation_type='relu', regularizer=None, attention_ratio=0):
-		x = conv_2d(x, num_filters, filter_size, activation=activation_type, regularizer=regularizer, name=name)
+	def convolution_layer(self, x, num_filters, filter_size, name, activation_type='relu',
+						regularizer=None, stride=1, weight_decay=1e-4, attention_ratio=0):
+
+		x = conv_2d(x, num_filters, filter_size, strides=stride, activation=activation_type,
+					regularizer=regularizer, weight_decay=weight_decay, name=name)
+
 		if attention_ratio>0:
 			x = self.se_layer(x, num_filters, name=name+'_se', activation_type=activation_type, ratio=attention_ratio)
+
 		return x
 
 	def max_pooling_layer(self, x, kernel_size, name):
@@ -77,16 +82,26 @@ class CNNModel(object):
 		return dropout(x, prob, name = name)
 
 	def define_network(self, X_images, Y_targets, num_outputs=2, optimizer='adam', lr=1e-3,
-						attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
+			use_pooling=True, attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
 
 		x = self.input_layer(X_images, name='input')
 		x = self.convolution_layer(x, 32, 5, 'conv1', 'relu', 'L2', attention_ratio=attention_ratio)
-		x = self.max_pooling_layer(x, 2, 'mp1')
+
+		if use_pooling:
+			x = self.max_pooling_layer(x, 2, 'mp1')
+		else:
+			x = self.convolution_layer(x, 32, 5, 'mp1', 'relu', 'L2', stride=2, attention_ratio=attention_ratio)
+
 		x = self.convolution_layer(x, 64, 5, 'conv2', 'relu', 'L2', attention_ratio=attention_ratio)
 		x = self.convolution_layer(x, 64, 3, 'conv3', 'relu', 'L2', attention_ratio=attention_ratio)
-		x = self.max_pooling_layer(x, 2, 'mp2')
-		x = self.fully_connected_layer(x, 512,'relu', 'fl1')
+
+		if use_pooling:
+			x = self.max_pooling_layer(x, 2, 'mp2')
+		else:
+			x = self.convolution_layer(x, 64, 3, 'mp2', 'relu', 'L2', stride=2, attention_ratio=attention_ratio)
+
 		x = self.dropout_layer(x, 'dp1', 0.5)
+		x = self.fully_connected_layer(x, 512,'relu', 'fl1')
 		placeholder = tf.placeholder(shape=[None, Y_targets.shape[1]], dtype=tf.float32, name="input_label")
 
 		if use_triplet:

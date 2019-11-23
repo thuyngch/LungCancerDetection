@@ -220,6 +220,8 @@ if __name__ == "__main__":
 		triplet_hard_mining=triplet_hard_mining,
 	)
 	model = tflearn.DNN(network)
+
+	ckpt = tf.train.latest_checkpoint(ckpt)
 	model.load(ckpt)
 
 	# Model prediction
