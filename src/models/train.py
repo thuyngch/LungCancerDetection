@@ -69,7 +69,7 @@ if __name__ == "__main__":
 		X_train_images, Y_train_labels, num_outputs=num_outputs, optimizer='adam', lr=lr,
 		attention_ratio=attention_ratio, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
-	model = tflearn.DNN(network, best_checkpoint_path=ckpt)
+	model = tflearn.DNN(network, best_checkpoint_path=ckpt, max_checkpoints=1)
 
 	# Training and validating
 	model.fit(
@@ -83,8 +83,5 @@ if __name__ == "__main__":
 		snapshot_epoch=True,
 		run_id='nodule3-classifier',
 	)
-
-	# Save checkpoint
-	# model.save(ckpt)
 	h5f.close()
 	h5f2.close()
