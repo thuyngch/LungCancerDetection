@@ -10,16 +10,21 @@ export CUDA_VISIBLE_DEVICES=0
 
 # Testings
 python src/models/test.py \
-    --ckpt "ckpt/attention0.25_softmax_bs8/nodule3-classifier.ckpt" \
+    --ckpt "ckpt/attention0.25_softmax_bs8_ep100/nodule3-classifier.ckpt" \
     --num_outputs 2 \
     --attention_ratio 0.25
 
 python src/models/test.py \
-    --ckpt "ckpt/attention0.75_softmax_bs8/nodule3-classifier.ckpt" \
+    --ckpt "ckpt/attention0.5_softmax_bs8_ep100/nodule3-classifier.ckpt" \
+    --num_outputs 2 \
+    --attention_ratio 0.5
+
+python src/models/test.py \
+    --ckpt "ckpt/attention0.75_softmax_bs8_ep100/nodule3-classifier.ckpt" \
     --num_outputs 2 \
     --attention_ratio 0.75
 
 python src/models/test.py \
-    --ckpt "ckpt/attention1.0_softmax_bs8/nodule3-classifier.ckpt" \
+    --ckpt "ckpt/attention1.0_softmax_bs8_ep100/nodule3-classifier.ckpt" \
     --num_outputs 2 \
     --attention_ratio 1.0

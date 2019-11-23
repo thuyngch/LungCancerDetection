@@ -39,7 +39,6 @@ def create_mosaic(image, nrows, ncols):
 	image = image.reshape(M*nrows, N*ncols)
 	return image
 
-
 def format_image(image, num_images):
 	"""
 	Formats images
@@ -49,7 +48,6 @@ def format_image(image, num_images):
 	N = image.shape[2]
 	imagex = np.squeeze(image[idxs, :, :, :])
 	return imagex
-
 
 def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Purples):
 	"""
@@ -82,7 +80,6 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
 	plt.ylabel('True label')
 	plt.xlabel('Predicted label')
 
-
 def load_images(filename):
 	"""
 	Loads images contained in hdfs file
@@ -91,7 +88,6 @@ def load_images(filename):
 	X_test_images = h5f2['X']
 	Y_test_labels = h5f2['Y']
 	return X_test_images, Y_test_labels
-
 
 def plot_predictions(images, filename):
 	"""
@@ -103,7 +99,6 @@ def plot_predictions(images, filename):
 	plt.imshow(mosaic, cmap = 'gray')
 	plt.axis('off')
 	plt.savefig(filename + '.png', bbox_inches='tight')
-
 
 def get_predictions(model, X_test_images, Y_test_labels):
 	"""
@@ -121,7 +116,6 @@ def get_predictions(model, X_test_images, Y_test_labels):
 	label_predictions[np.arange(len(predictions)), predictions.argmax(1)] = 1
 	return predictions, label_predictions
 
-
 def get_roc_curve(Y_test_labels, predictions):
 	"""
 	Args:
@@ -137,7 +131,6 @@ def get_roc_curve(Y_test_labels, predictions):
 	fpr, tpr, thresholds = roc_curve(Y_test_labels[:,1], predictions[:,1], pos_label=1)
 	roc_auc = auc(fpr, tpr)
 	return fpr, tpr, roc_auc
-
 
 def get_metrics(Y_test_labels, label_predictions):
 	"""
@@ -161,7 +154,6 @@ def get_metrics(Y_test_labels, label_predictions):
 	specificity = TN*1.0/(TN+FP)
 
 	return precision, recall, specificity, cm
-
 
 def plot_roc_curve(fpr, tpr, roc_auc):
 	"""

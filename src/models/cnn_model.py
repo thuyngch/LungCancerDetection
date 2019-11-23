@@ -34,6 +34,8 @@ class CNNModel(object):
 	def augmentation(self):
 		img_aug = ImageAugmentation()
 		img_aug.add_random_flip_leftright()
+		img_aug.add_random_flip_updown()
+		img_aug.add_random_90degrees_rotation()
 		img_aug.add_random_rotation(max_angle=25.)
 		img_aug.add_random_blur(sigma_max=3.)
 		return img_aug

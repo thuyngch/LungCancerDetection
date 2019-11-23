@@ -10,25 +10,33 @@ export CUDA_VISIBLE_DEVICES=0
 
 # Multiple trainings
 python src/models/train.py \
-    --ckpt "ckpt/attention0.25_softmax_bs8/nodule3-classifier.ckpt" \
+    --ckpt "ckpt/attention0.25_softmax_bs8_ep100/nodule3-classifier.ckpt" \
     --num_outputs 2 \
     --lr 5e-4 \
-    --epoch 50 \
+    --epoch 100 \
     --batch_size 8 \
     --attention_ratio 0.25
 
 python src/models/train.py \
-    --ckpt "ckpt/attention0.75_softmax_bs8/nodule3-classifier.ckpt" \
+    --ckpt "ckpt/attention0.5_softmax_bs8_ep100/nodule3-classifier.ckpt" \
     --num_outputs 2 \
     --lr 5e-4 \
-    --epoch 50 \
+    --epoch 100 \
+    --batch_size 8 \
+    --attention_ratio 0.5
+
+python src/models/train.py \
+    --ckpt "ckpt/attention0.75_softmax_bs8_ep100/nodule3-classifier.ckpt" \
+    --num_outputs 2 \
+    --lr 5e-4 \
+    --epoch 100 \
     --batch_size 8 \
     --attention_ratio 0.75
 
 python src/models/train.py \
-    --ckpt "ckpt/attention1.0_softmax_bs8/nodule3-classifier.ckpt" \
+    --ckpt "ckpt/attention1.0_softmax_bs8_ep100/nodule3-classifier.ckpt" \
     --num_outputs 2 \
     --lr 5e-4 \
-    --epoch 50 \
+    --epoch 100 \
     --batch_size 8 \
     --attention_ratio 1.0

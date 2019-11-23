@@ -69,7 +69,7 @@ if __name__ == "__main__":
 		X_train_images, Y_train_labels, num_outputs=num_outputs, optimizer='adam', lr=lr,
 		attention_ratio=attention_ratio, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
-	model = tflearn.DNN(network)
+	model = tflearn.DNN(network, best_checkpoint_path=ckpt)
 
 	# Training and validating
 	model.fit(
@@ -85,6 +85,6 @@ if __name__ == "__main__":
 	)
 
 	# Save checkpoint
-	model.save(ckpt)
+	# model.save(ckpt)
 	h5f.close()
 	h5f2.close()
