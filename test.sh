@@ -10,25 +10,8 @@ export CUDA_VISIBLE_DEVICES=0
 
 # Testings
 python src/models/test.py \
-    --ckpt "ckpt/attention0.25_softmax_bs8_ep50/" \
+    --ckpt "ckpt/attention1.0_softmax_bs8_ep200/" \
     --num_outputs 2 \
-    --use_pooling \
-    --attention_ratio 0.25
-
-python src/models/test.py \
-    --ckpt "ckpt/attention0.5_softmax_bs8_ep50/" \
-    --num_outputs 2 \
-    --use_pooling \
-    --attention_ratio 0.5
-
-python src/models/test.py \
-    --ckpt "ckpt/attention0.75_softmax_bs8_ep50/" \
-    --num_outputs 2 \
-    --use_pooling \
-    --attention_ratio 0.75
-
-python src/models/test.py \
-    --ckpt "ckpt/attention1.0_softmax_bs8_ep50/" \
-    --num_outputs 2 \
+    --hidden_embedding 512 \
     --use_pooling \
     --attention_ratio 1.0

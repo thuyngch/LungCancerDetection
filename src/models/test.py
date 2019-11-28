@@ -175,20 +175,58 @@ def plot_roc_curve(fpr, tpr, roc_auc):
 
 
 #------------------------------------------------------------------------------
+#  Evaluation
+#------------------------------------------------------------------------------
+def eval_softmax(model, X_test_images, Y_test_labels):
+	predictions, label_predictions = get_predictions(model, X_test_images, Y_test_labels)
+	precision, recall, specificity, cm = get_metrics(Y_test_labels, label_predictions)
+	return precision, recall, specificity
+
+
+def eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels):
+	# Get clusters
+	preds = model.predict(X_train_images[:,:,:,:])
+	pos_indicator = Y_train_labels[:,1]==1
+	neg_indicator = Y_train_labels[:,0]==1
+	pos_embeddings = preds[pos_indicator,:]
+	neg_embeddings = preds[neg_indicator,:]
+	avg_pos_embedding = pos_embeddings.mean(axis=0)
+	avg_neg_embedding = neg_embeddings.mean(axis=0)
+
+	# Prediction
+	embeddings = model.predict(X_test_images[:,:,:,:])
+	pos_dists = ((embeddings-avg_pos_embedding)**2).sum(axis=1)[:,np.newaxis]
+	neg_dists = ((embeddings-avg_neg_embedding)**2).sum(axis=1)[:,np.newaxis]
+	dists = np.hstack([neg_dists, pos_dists])
+	pred_indicies = np.argmin(dists, axis=1)
+	neg_pred_indicies = np.argmax(dists, axis=1)
+	predictions = np.hstack([neg_pred_indicies[:,np.newaxis], pred_indicies[:,np.newaxis]])
+	precision, recall, specificity, cm = get_metrics(Y_test_labels, predictions)
+
+	return precision, recall, specificity
+
+
+#------------------------------------------------------------------------------
 #  Argument parser
 #------------------------------------------------------------------------------
 # Argument parser
 parser = argparse.ArgumentParser(description='Test model')
 
-parser.add_argument('--test_data', type=str, default='src/data/test.h5', help='Training data h5-file')
+parser.add_argument('--train_data', type=str, default='src/data/train.h5', help='Training data h5-file')
+
+parser.add_argument('--test_data', type=str, default='src/data/test.h5', help='Testing data h5-file')
 
 parser.add_argument('--ckpt', type=str, default='ckpt/attention0.5_softmax_bs8/nodule3-classifier.ckpt', help='Checkpoint path')
 
 parser.add_argument('--num_outputs', type=int, default=2, help='Number of outputs')
 
+parser.add_argument('--hidden_embedding', type=int, default=512, help='Hidden embedding size')
+
 parser.add_argument('--attention_ratio', type=float, default=0.0, help='Attention ratio')
 
 parser.add_argument('--use_pooling', action='store_true', default=False, help='Use max pooling')
+
+parser.add_argument('--use_bn', action='store_true', default=False, help='Use batchnorm')
 
 parser.add_argument('--use_triplet', action='store_true', default=False, help='Use triplet loss instead of CE loss')
 
@@ -197,11 +235,15 @@ parser.add_argument('--triplet_hard_mining', action='store_true', default=False,
 args = parser.parse_args()
 
 # Take arguments
+train_data = args.train_data
 test_data = args.test_data
 ckpt = args.ckpt
 os.makedirs(os.path.dirname(ckpt), exist_ok=True)
 
+use_bn = args.use_bn
 num_outputs = args.num_outputs
+hidden_embedding = args.hidden_embedding
+
 attention_ratio = args.attention_ratio
 use_pooling = args.use_pooling
 use_triplet = args.use_triplet
@@ -213,46 +255,28 @@ triplet_hard_mining = args.triplet_hard_mining
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
 	# Load data
+	X_train_images, Y_train_labels = load_images(train_data)
 	X_test_images, Y_test_labels = load_images(test_data)
 
 	# Build model
 	convnet  = CNNModel()
 	network = convnet.define_network(
-		X_test_images, Y_test_labels, num_outputs=num_outputs,
-		use_pooling=use_pooling, attention_ratio=attention_ratio,
+		X_test_images, Y_test_labels, num_outputs=num_outputs, hidden_embedding=hidden_embedding,
+		use_pooling=use_pooling, use_bn=use_bn, attention_ratio=attention_ratio,
 		use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
 	model = tflearn.DNN(network)
 
 	ckpt = tf.train.latest_checkpoint(ckpt)
+	print("ckpt", ckpt)
 	model.load(ckpt)
 
 	# Model prediction
-	predictions, label_predictions = get_predictions(model, X_test_images, Y_test_labels)
+	if not use_triplet:
+		precision, recall, specificity = eval_softmax(model, X_test_images, Y_test_labels)
+	else:
+		precision, recall, specificity = eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels)
 
-	# Get metrics
-	precision, recall, specificity, cm = get_metrics(Y_test_labels, label_predictions)
-	print("precision:", precision)
-	print("recall:", recall)
-	print("specificity:", specificity)
-
-	# # Get ROC
-	# fpr, tpr, roc_auc = get_roc_curve(Y_test_labels, predictions)
-	# plot_roc_curve(fpr, tpr, roc_auc)
-
-	# # Plot non-normalized confusion matrix
-	# plt.figure()
-	# plot_confusion_matrix(cm, classes=['no-nodule', 'nodule'], title='Confusion matrix')
-	# plt.savefig('confusion_matrix.png', bbox_inches='tight')
-
-	# # Plot all inputs representing True Positives, FP, FN, TN
-	# TP_images = X_test_images[(Y_test_labels[:,1] == 1) & (label_predictions[:,1] == 1), :,:,:]
-	# FP_images = X_test_images[(Y_test_labels[:,1] == 0) & (label_predictions[:,1] == 1), :,:,:]
-	# TN_images = X_test_images[(Y_test_labels[:,1] == 0) & (label_predictions[:,1] == 0), :,:,:]
-	# FN_images = X_test_images[(Y_test_labels[:,1] == 1) & (label_predictions[:,1] == 0), :,:,:]
-
-	## Choose 16 images randomly
-	# plot_predictions(TP_images, 'preds_tps')
-	# plot_predictions(TN_images, 'preds_tns')
-	# plot_predictions(FN_images, 'preds_fns')
-	# plot_predictions(FP_images, 'preds_fps')
+	print("precision: %.6f" % (precision))
+	print("recall: %.6f" % (recall))
+	print("specificity: %.6f" % (specificity))

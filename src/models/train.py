@@ -20,6 +20,8 @@ parser.add_argument('--ckpt', type=str, default='ckpt/attention0.5_softmax_bs8/n
 
 parser.add_argument('--num_outputs', type=int, default=2, help='Number of outputs')
 
+parser.add_argument('--hidden_embedding', type=int, default=512, help='Hidden embedding size')
+
 parser.add_argument('--lr', type=float, default=1e-3, help='Learning rate')
 
 parser.add_argument('--epoch', type=int, default=50, help='Number of epochs')
@@ -29,6 +31,8 @@ parser.add_argument('--batch_size', type=int, default=8, help='Batch size')
 parser.add_argument('--attention_ratio', type=float, default=0.0, help='Attention ratio')
 
 parser.add_argument('--use_pooling', action='store_true', default=False, help='Use max pooling')
+
+parser.add_argument('--use_bn', action='store_true', default=False, help='Use batchnorm')
 
 parser.add_argument('--use_triplet', action='store_true', default=False, help='Use triplet loss instead of CE loss')
 
@@ -42,7 +46,10 @@ valid_data = args.valid_data
 ckpt = args.ckpt
 os.makedirs(os.path.dirname(ckpt), exist_ok=True)
 
+use_bn = args.use_bn
 num_outputs = args.num_outputs
+hidden_embedding = args.hidden_embedding
+
 lr = args.lr
 epochs = args.epoch
 batch_size = args.batch_size
@@ -69,8 +76,10 @@ if __name__ == "__main__":
 	# Model definition
 	convnet  = CNNModel()
 	network = convnet.define_network(
-		X_train_images, Y_train_labels, num_outputs=num_outputs, optimizer='adam', lr=lr, use_pooling=use_pooling,
-		attention_ratio=attention_ratio, use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
+		X_train_images, Y_train_labels,
+		num_outputs=num_outputs, hidden_embedding=hidden_embedding, optimizer='adam', lr=lr,
+		use_pooling=use_pooling, use_bn=use_bn, attention_ratio=attention_ratio,
+		use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
 	model = tflearn.DNN(network, best_checkpoint_path=ckpt, max_checkpoints=1)
 

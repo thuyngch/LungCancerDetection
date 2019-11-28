@@ -6,6 +6,7 @@ import tflearn
 from tflearn.layers.merge_ops import merge
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.conv import conv_2d, max_pool_2d, global_avg_pool
+from tflearn.layers.normalization import batch_normalization
 from tflearn.layers.estimator import regression
 from tflearn.data_preprocessing import ImagePreprocessing
 from tflearn.data_augmentation import ImageAugmentation
@@ -59,15 +60,18 @@ class CNNModel(object):
 		scale = x * excitation
 		return scale
 
-	def convolution_layer(self, x, num_filters, filter_size, name, activation_type='relu',
+	def convolution_layer(self, x, num_filters, filter_size, name, use_bn=False, activation_type='relu',
 						regularizer=None, stride=1, weight_decay=1e-4, attention_ratio=0):
 
-		x = conv_2d(x, num_filters, filter_size, strides=stride, activation=activation_type,
-					regularizer=regularizer, weight_decay=weight_decay, name=name)
+		x = conv_2d(x, num_filters, filter_size, strides=stride, activation=activation_type, regularizer=regularizer, weight_decay=weight_decay, name=name)
 
 		if attention_ratio>0:
 			x = self.se_layer(x, num_filters, name=name+'_se', activation_type=activation_type, ratio=attention_ratio)
 
+		if use_bn:
+			x = batch_normalization(x, name=name+'_bn')
+
+		# x = tf.nn.relu(x, name=name+'_activ')
 		return x
 
 	def max_pooling_layer(self, x, kernel_size, name):
@@ -81,27 +85,81 @@ class CNNModel(object):
 			raise ValueError('Probability values should e between 0 and 1')
 		return dropout(x, prob, name = name)
 
-	def define_network(self, X_images, Y_targets, num_outputs=2, optimizer='adam', lr=1e-3,
-			use_pooling=True, attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
+	# def define_network(self, X_images, Y_targets, num_outputs=2, hidden_embedding=512, optimizer='adam', lr=1e-3,
+	# 		use_pooling=True, use_bn=False, attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
+
+	# 	x = self.input_layer(X_images, name='input')
+	# 	x = self.convolution_layer(x, 32, 3, 'conv1', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	x = self.convolution_layer(x, 32, 3, 'conv2', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+
+	# 	if use_pooling:
+	# 		x = self.max_pooling_layer(x, 2, 'mp1')
+	# 	else:
+	# 		x = self.convolution_layer(x, 64, 3, 'mp1', use_bn, 'relu', 'L2', stride=2, attention_ratio=attention_ratio)
+
+	# 	x = self.convolution_layer(x, 64, 3, 'conv3', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	x = self.convolution_layer(x, 64, 3, 'conv4', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	x = self.convolution_layer(x, 64, 3, 'conv5', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+
+	# 	# if use_pooling:
+	# 	# 	x = self.max_pooling_layer(x, 2, 'mp2')
+	# 	# else:
+	# 	# 	x = self.convolution_layer(x, 128, 3, 'mp2', use_bn, 'relu', 'L2', stride=2, attention_ratio=attention_ratio)
+
+	# 	# x = self.convolution_layer(x, 128, 3, 'conv6', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	# x = self.convolution_layer(x, 128, 3, 'conv7', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	# x = self.convolution_layer(x, 128, 3, 'conv8', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	# x = self.convolution_layer(x, 128, 3, 'conv9', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+
+	# 	# if use_pooling:
+	# 	# 	x = self.max_pooling_layer(x, 2, 'mp3')
+	# 	# else:
+	# 	# 	x = self.convolution_layer(x, 256, 3, 'mp3', use_bn, 'relu', 'L2', stride=2, attention_ratio=attention_ratio)
+
+	# 	# x = self.convolution_layer(x, 256, 3, 'conv10', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	# x = self.convolution_layer(x, 256, 3, 'conv11', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	# x = self.convolution_layer(x, 256, 3, 'conv12', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+	# 	# x = self.convolution_layer(x, 256, 3, 'conv13', use_bn, 'relu', 'L2', attention_ratio=attention_ratio)
+
+	# 	x = self.dropout_layer(x, 'dp', 0.5)
+	# 	# x = global_avg_pool(x, name='gap')
+	# 	x = self.fully_connected_layer(x, hidden_embedding, 'relu', 'fc')
+	# 	placeholder = tf.placeholder(shape=[None, Y_targets.shape[1]], dtype=tf.float32, name="input_label")
+
+	# 	if use_triplet:
+	# 		x = self.fully_connected_layer(x, num_outputs, 'linear', 'fl2')
+	# 		loss = batch_hard_triplet_loss if triplet_hard_mining else batch_all_triplet_loss
+	# 		x = regression(
+	# 			x,
+	# 			optimizer=optimizer, 
+	# 			learning_rate=lr,
+	# 			loss=loss,
+	# 			placeholder=placeholder,
+	# 		)
+	# 	else:
+	# 		x = self.fully_connected_layer(x, num_outputs, 'softmax', 'fl2')
+	# 		x = regression(
+	# 			x,
+	# 			optimizer=optimizer, 
+	# 			learning_rate=lr,
+	# 			loss='categorical_crossentropy',
+	# 			placeholder=placeholder,
+	# 		)
+	# 	print("[{}] Build model with attention_ratio: {}".format(self.__class__.__name__, attention_ratio))
+	# 	print("[{}] Build model with TripletLoss: {}; HardMining: {}".format(self.__class__.__name__, use_triplet, triplet_hard_mining))
+	# 	return x
+
+	def define_network(self, X_images, Y_targets, num_outputs=2, hidden_embedding=512, optimizer='adam', lr=1e-3,
+			use_pooling=True, use_bn=False, attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
 
 		x = self.input_layer(X_images, name='input')
-		x = self.convolution_layer(x, 32, 5, 'conv1', 'relu', 'L2', attention_ratio=attention_ratio)
-
-		if use_pooling:
-			x = self.max_pooling_layer(x, 2, 'mp1')
-		else:
-			x = self.convolution_layer(x, 32, 5, 'mp1', 'relu', 'L2', stride=2, attention_ratio=attention_ratio)
-
-		x = self.convolution_layer(x, 64, 5, 'conv2', 'relu', 'L2', attention_ratio=attention_ratio)
-		x = self.convolution_layer(x, 64, 3, 'conv3', 'relu', 'L2', attention_ratio=attention_ratio)
-
-		if use_pooling:
-			x = self.max_pooling_layer(x, 2, 'mp2')
-		else:
-			x = self.convolution_layer(x, 64, 3, 'mp2', 'relu', 'L2', stride=2, attention_ratio=attention_ratio)
-
-		x = self.dropout_layer(x, 'dp1', 0.5)
+		x = self.convolution_layer(x, 32, 5, name='conv1', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+		x = self.max_pooling_layer(x, 2, 'mp1')
+		x = self.convolution_layer(x, 64, 5, name='conv2', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+		x = self.convolution_layer(x, 64, 3, name='conv3', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+		x = self.max_pooling_layer(x, 2, 'mp2')
 		x = self.fully_connected_layer(x, 512,'relu', 'fl1')
+		x = self.dropout_layer(x, 'dp1', 0.5)
 		placeholder = tf.placeholder(shape=[None, Y_targets.shape[1]], dtype=tf.float32, name="input_label")
 
 		if use_triplet:
