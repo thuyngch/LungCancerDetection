@@ -111,10 +111,10 @@ def get_predictions(model, X_test_images, Y_test_labels):
 	predictions: probability values for each class 
 	label_predictions: returns predicted classes
 	"""
-	predictions = np.vstack(model.predict(X_test_images[:,:,:,:]))
-	label_predictions = np.zeros_like(predictions)
-	label_predictions[np.arange(len(predictions)), predictions.argmax(1)] = 1
-	return predictions, label_predictions
+	scores = np.vstack(model.predict(X_test_images[:,:,:,:]))
+	label_predictions = np.zeros_like(scores)
+	label_predictions[np.arange(len(scores)), scores.argmax(1)] = 1
+	return scores, label_predictions
 
 def get_roc_curve(Y_test_labels, predictions):
 	"""
@@ -177,8 +177,32 @@ def plot_roc_curve(fpr, tpr, roc_auc):
 #------------------------------------------------------------------------------
 #  Evaluation
 #------------------------------------------------------------------------------
-def eval_softmax(model, X_test_images, Y_test_labels):
-	predictions, label_predictions = get_predictions(model, X_test_images, Y_test_labels)
+def eval_softmax(model, X_test_images, Y_test_labels, tta=False):
+	X_test_images = X_test_images.value
+
+	if not tta:
+		scores, label_predictions = get_predictions(model, X_test_images, Y_test_labels)
+
+	else:
+		# Prepare augmented samples
+		list_X_test_images = [
+			X_test_images.copy(),
+			# X_test_images[:,:,::-1,:].copy(),
+			X_test_images[:,:,:,::-1].copy(),
+			# X_test_images[:,:,::-1,::-1].copy(),
+		]
+		# Get predicted scores
+		scores = []
+		for test_images in list_X_test_images:
+			score, _ = get_predictions(model, test_images, Y_test_labels)
+			scores.append(score)
+		scores = np.stack(scores)
+		scores = scores.mean(axis=0)
+
+		# Get predicted labels
+		label_predictions = np.zeros_like(scores)
+		label_predictions[np.arange(len(scores)), scores.argmax(1)] = 1
+
 	precision, recall, specificity, cm = get_metrics(Y_test_labels, label_predictions)
 	return precision, recall, specificity
 
@@ -232,6 +256,8 @@ parser.add_argument('--use_triplet', action='store_true', default=False, help='U
 
 parser.add_argument('--triplet_hard_mining', action='store_true', default=False, help='Batch-hard triplet loss')
 
+parser.add_argument('--tta', action='store_true', default=False, help='Test time augmentation')
+
 args = parser.parse_args()
 
 # Take arguments
@@ -248,6 +274,7 @@ attention_ratio = args.attention_ratio
 use_pooling = args.use_pooling
 use_triplet = args.use_triplet
 triplet_hard_mining = args.triplet_hard_mining
+tta = args.tta
 
 
 #------------------------------------------------------------------------------
@@ -273,9 +300,9 @@ if __name__ == "__main__":
 
 	# Model prediction
 	if not use_triplet:
-		precision, recall, specificity = eval_softmax(model, X_test_images, Y_test_labels)
+		precision, recall, specificity = eval_softmax(model, X_test_images, Y_test_labels, tta)
 	else:
-		precision, recall, specificity = eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels)
+		precision, recall, specificity = eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels, tta)
 
 	print("precision: %.6f" % (precision))
 	print("recall: %.6f" % (recall))

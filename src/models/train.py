@@ -38,12 +38,15 @@ parser.add_argument('--use_triplet', action='store_true', default=False, help='U
 
 parser.add_argument('--triplet_hard_mining', action='store_true', default=False, help='Batch-hard triplet loss')
 
+parser.add_argument('--resume', type=str, default=None, help='Resume ckpt path')
+
 args = parser.parse_args()
 
 # Take arguments
 train_data = args.train_data
 valid_data = args.valid_data
 ckpt = args.ckpt
+resume = args.resume
 os.makedirs(os.path.dirname(ckpt), exist_ok=True)
 
 use_bn = args.use_bn
@@ -82,6 +85,11 @@ if __name__ == "__main__":
 		use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
 	model = tflearn.DNN(network, best_checkpoint_path=ckpt, max_checkpoints=1)
+
+	# Resume
+	if resume is not None:
+		model.load(resume)
+		print("Load checkpoint from %s" % (resume))
 
 	# Training and validating
 	model.fit(
