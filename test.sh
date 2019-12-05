@@ -15,12 +15,4 @@ python src/models/test.py \
     --num_outputs 2 \
     --hidden_embedding 512 \
     --use_pooling \
-    --attention_ratio 1.0 #--tta
-
-# python src/models/test.py \
-#     --ckpt "ckpt/attention1.0_triplet128_bs128_ep200/" \
-#     --num_outputs 128 \
-#     --hidden_embedding 256 \
-#     --use_pooling \
-#     --use_triplet \
-#     --attention_ratio 1.0
+    --attention_ratio 1.0 --tta

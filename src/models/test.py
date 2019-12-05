@@ -178,7 +178,7 @@ def plot_roc_curve(fpr, tpr, roc_auc):
 #  Evaluation
 #------------------------------------------------------------------------------
 def eval_softmax(model, X_test_images, Y_test_labels, tta=False):
-	X_test_images = X_test_images.value
+	X_test_images = X_test_images.value.astype('float32')
 
 	if not tta:
 		scores, label_predictions = get_predictions(model, X_test_images, Y_test_labels)
@@ -207,7 +207,7 @@ def eval_softmax(model, X_test_images, Y_test_labels, tta=False):
 	return precision, recall, specificity
 
 
-def eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels):
+def eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels, tta):
 	# Get clusters
 	preds = model.predict(X_train_images[:,:,:,:])
 	pos_indicator = Y_train_labels[:,1]==1
