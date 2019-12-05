@@ -294,6 +294,7 @@ if __name__ == "__main__":
 	)
 	model = tflearn.DNN(network)
 
+	print("ckpt_dir", ckpt)
 	ckpt = tf.train.latest_checkpoint(ckpt)
 	print("ckpt", ckpt)
 	model.load(ckpt)

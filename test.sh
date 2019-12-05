@@ -11,7 +11,7 @@ export CUDA_VISIBLE_DEVICES=1
 # Testings
 
 python src/models/test.py \
-    --ckpt "ckpt/attention1.0_softmax_bs8_ep200/" \
+    --ckpt "/home/thuync/Dropbox/work/projects/LungCancerDetection/exp/attention1.0_softmax_bs8_ep200_triplettest/" \
     --num_outputs 2 \
     --hidden_embedding 512 \
     --use_pooling \
