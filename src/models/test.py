@@ -240,7 +240,7 @@ parser.add_argument('--train_data', type=str, default='src/data/train.h5', help=
 
 parser.add_argument('--test_data', type=str, default='src/data/test.h5', help='Testing data h5-file')
 
-parser.add_argument('--ckpt', type=str, default='ckpt/attention0.5_softmax_bs8/nodule3-classifier.ckpt', help='Checkpoint path')
+parser.add_argument('--ckpt', type=str, default='ckpt/attention0.5_softmax_bs8/', help='Checkpoint dir')
 
 parser.add_argument('--num_outputs', type=int, default=2, help='Number of outputs')
 
