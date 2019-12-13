@@ -1,6 +1,10 @@
 #------------------------------------------------------------------------------
 #  Libraries
 #------------------------------------------------------------------------------
+import tensorflow as tf
+gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+
 import numpy as np
 import tflearn, h5py, os, argparse
 from src.models.cnn_model import CNNModel
@@ -14,7 +18,7 @@ parser = argparse.ArgumentParser(description='Train model')
 
 parser.add_argument('--train_data', type=str, default='src/data/train.h5', help='Training data h5-file')
 
-parser.add_argument('--valid_data', type=str, default='src/data/test.h5', help='Validating data h5-file')
+parser.add_argument('--valid_data', type=str, default='src/data/val.h5', help='Validating data h5-file')
 
 parser.add_argument('--ckpt', type=str, default='ckpt/attention0.5_softmax_bs8/nodule3-classifier.ckpt', help='Checkpoint path')
 
