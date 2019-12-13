@@ -88,7 +88,11 @@ if __name__ == "__main__":
 		use_pooling=use_pooling, use_bn=use_bn, attention_ratio=attention_ratio,
 		use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining,
 	)
-	model = tflearn.DNN(network, best_checkpoint_path=ckpt, max_checkpoints=1)
+	model = tflearn.DNN(
+		network,
+		max_checkpoints=1, best_checkpoint_path=ckpt,
+		tensorboard_verbose=0, tensorboard_dir=os.path.dirname(ckpt),
+	)
 
 	# Resume
 	if resume is not None:
