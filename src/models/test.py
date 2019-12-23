@@ -161,7 +161,7 @@ def get_metrics(Y_test_labels, label_predictions):
 def plot_roc_curve(fpr, tpr, roc_auc):
 	lw = 2
 	# plt.figure(dpi=100)
-	plt.plot(fpr, tpr, color='darkorange', lw=lw, label='(AUC = %0.2f)' % roc_auc)
+	plt.plot(fpr, tpr, color='darkorange', lw=lw, label='(AUC = %0.6f)' % roc_auc)
 	plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
 	plt.axis('equal')
 	plt.xlabel('False Positive Rate')
@@ -298,7 +298,7 @@ if __name__ == "__main__":
 	print("ckpt_dir", ckpt)
 	ckpt = tf.train.latest_checkpoint(ckpt)
 	print("ckpt", ckpt)
-	model.load(ckpt, weights_only=True)
+	model.load(ckpt)
 
 	# Model prediction
 	if not use_triplet:
