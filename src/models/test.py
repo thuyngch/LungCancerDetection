@@ -6,9 +6,12 @@ from cnn_model import CNNModel
 import numpy as np 
 import pandas as pd 
 import tensorflow as tf
-import matplotlib.pyplot as plt
 import pickle, argparse, h5py, os, itertools, tflearn
 from sklearn.metrics import roc_curve, auc, confusion_matrix
+
+import matplotlib
+matplotlib.use('pdf')
+import matplotlib.pyplot as plt
 
 
 #------------------------------------------------------------------------------
@@ -156,22 +159,17 @@ def get_metrics(Y_test_labels, label_predictions):
 	return precision, recall, specificity, cm
 
 def plot_roc_curve(fpr, tpr, roc_auc):
-	"""
-	Plots ROC curve
-
-	Args:
-	-----
-	FPR, TPR and AUC
-	"""
-	plt.figure()
 	lw = 2
+	# plt.figure(dpi=100)
 	plt.plot(fpr, tpr, color='darkorange', lw=lw, label='(AUC = %0.2f)' % roc_auc)
 	plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
 	plt.axis('equal')
 	plt.xlabel('False Positive Rate')
 	plt.ylabel('True Positive Rate')
+	plt.xlim(0.0, 1.0)
+	plt.ylim(0.0, 1.0)
 	plt.legend(loc="lower right")
-	plt.savefig('roc1.png', bbox_inches='tight')
+	plt.savefig('roc.png', bbox_inches='tight')
 
 
 #------------------------------------------------------------------------------
@@ -203,8 +201,11 @@ def eval_softmax(model, X_test_images, Y_test_labels, tta=False):
 		label_predictions = np.zeros_like(scores)
 		label_predictions[np.arange(len(scores)), scores.argmax(1)] = 1
 
+	fpr, tpr, roc_auc = get_roc_curve(Y_test_labels, scores)
+	plot_roc_curve(fpr, tpr, roc_auc)
+
 	precision, recall, specificity, cm = get_metrics(Y_test_labels, label_predictions)
-	return precision, recall, specificity
+	return precision, recall, specificity, cm
 
 
 def eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels, tta):
@@ -225,9 +226,9 @@ def eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_la
 	pred_indicies = np.argmin(dists, axis=1)
 	neg_pred_indicies = np.argmax(dists, axis=1)
 	predictions = np.hstack([neg_pred_indicies[:,np.newaxis], pred_indicies[:,np.newaxis]])
-	precision, recall, specificity, cm = get_metrics(Y_test_labels, predictions)
 
-	return precision, recall, specificity
+	precision, recall, specificity, cm = get_metrics(Y_test_labels, predictions)
+	return precision, recall, specificity, cm
 
 
 #------------------------------------------------------------------------------
@@ -297,13 +298,13 @@ if __name__ == "__main__":
 	print("ckpt_dir", ckpt)
 	ckpt = tf.train.latest_checkpoint(ckpt)
 	print("ckpt", ckpt)
-	model.load(ckpt)
+	model.load(ckpt, weights_only=True)
 
 	# Model prediction
 	if not use_triplet:
-		precision, recall, specificity = eval_softmax(model, X_test_images, Y_test_labels, tta)
+		precision, recall, specificity, cm = eval_softmax(model, X_test_images, Y_test_labels, tta)
 	else:
-		precision, recall, specificity = eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels, tta)
+		precision, recall, specificity, cm = eval_triplet(model, X_train_images, Y_train_labels, X_test_images, Y_test_labels, tta)
 
 	print("precision: %.6f" % (precision))
 	print("recall: %.6f" % (recall))
