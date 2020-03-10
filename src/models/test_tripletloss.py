@@ -6,8 +6,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tflearn, h5py, cv2, itertools
 from matplotlib import pyplot as plt
-from sklearn.metrics import confusion_matrix
 from src.models.cnn_model import CNNModel
+from sklearn.metrics import roc_curve, auc, confusion_matrix
 
 
 #------------------------------------------------------------------------------
@@ -47,6 +47,37 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.xlabel('Predicted label')
 
 
+def get_roc_curve(Y_test_labels, predictions):
+	"""
+	Args:
+	-------
+	hdfs datasets: Y_test_labels and predictions
+	
+	Returns:
+	--------
+	fpr: false positive Rate
+	tpr: true posiive Rate
+	roc_auc: area under the curve value
+	"""
+	fpr, tpr, thresholds = roc_curve(Y_test_labels[:,1], predictions, pos_label=1)
+	roc_auc = auc(fpr, tpr)
+	return fpr, tpr, roc_auc
+
+
+def plot_roc_curve(fpr, tpr, roc_auc):
+	lw = 2
+	# plt.figure(dpi=100)
+	plt.plot(fpr, tpr, color='darkorange', lw=lw, label='(AUC = %0.6f)' % roc_auc)
+	plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+	plt.axis('equal')
+	plt.xlabel('False Positive Rate')
+	plt.ylabel('True Positive Rate')
+	plt.xlim(0.0, 1.0)
+	plt.ylim(0.0, 1.0)
+	plt.legend(loc="lower right")
+	plt.savefig('roc.png', bbox_inches='tight')
+
+
 #------------------------------------------------------------------------------
 #   Get clusters
 #------------------------------------------------------------------------------
@@ -66,9 +97,9 @@ model = tflearn.DNN(
 	network,
 	max_checkpoints=10,
 	tensorboard_verbose=1,
-	checkpoint_path='exp/triplet512all0.1_ep30/nodule3-classifier.ckpt',
+	checkpoint_path='ckpt/triplet512all0.1_ep30/nodule3-classifier.ckpt',
 )
-model.load("exp/triplet512all0.1_ep30/nodule3-classifier.ckpt")
+model.load("ckpt/triplet512all0.1_ep30/nodule3-classifier.ckpt")
 
 # Inference
 preds = model.predict(X_train_images[:,:,:,:])
@@ -113,3 +144,9 @@ precision, recall, specificity, cm = get_metrics(Y_test_labels, predictions)
 print("precision:", precision)
 print("recall:", recall)
 print("specificity:", specificity)
+
+# ROC curve
+min_dists = np.min(dists, axis=1)
+scores = (min_dists - min_dists.min()) / (min_dists.max()-min_dists.min())
+fpr, tpr, roc_auc = get_roc_curve(Y_test_labels, scores)
+plot_roc_curve(fpr, tpr, roc_auc)
