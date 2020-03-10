@@ -87,93 +87,87 @@ class CNNModel(object):
 			raise ValueError('Probability values should e between 0 and 1')
 		return dropout(x, prob, name = name)
 
-	# def define_network(self, X_images, Y_targets, num_outputs=2, hidden_embedding=512, optimizer='adam', lr=1e-3,
-	# 		use_pooling=True, use_bn=False, attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
-
-	# 	x = self.input_layer(X_images, name='input')
-	# 	x = self.convolution_layer(x, 32, 5, name='conv1', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
-	# 	x = self.max_pooling_layer(x, 2, 'mp1')
-	# 	x = self.convolution_layer(x, 64, 5, name='conv2', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
-	# 	x = self.convolution_layer(x, 64, 3, name='conv3', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
-	# 	x = self.max_pooling_layer(x, 2, 'mp2')
-	# 	x = self.fully_connected_layer(x, 512,'relu', 'fl1')
-	# 	x = self.dropout_layer(x, 'dp1', 0.5)
-	# 	placeholder = tf.placeholder(shape=[None, Y_targets.shape[1]], dtype=tf.float32, name="input_label")
-
-	# 	# optimizer = SGD(learning_rate=lr, lr_decay=0.95, decay_step=1000)
-	# 	# optimizer = Momentum(learning_rate=lr, momentum=0.9, lr_decay=0.95, decay_step=5000)
-	# 	# optimizer = Adam(learning_rate=lr)
-
-	# 	if use_triplet:
-	# 		x = self.fully_connected_layer(x, num_outputs, 'linear', 'fl2')
-	# 		loss = batch_hard_triplet_loss if triplet_hard_mining else batch_all_triplet_loss
-	# 		x = regression(
-	# 			x,
-	# 			optimizer=optimizer, 
-	# 			learning_rate=lr,
-	# 			loss=loss,
-	# 			placeholder=placeholder,
-	# 		)
-	# 	else:
-	# 		x = self.fully_connected_layer(x, num_outputs, 'softmax', 'fl2')
-	# 		x = regression(
-	# 			x,
-	# 			optimizer=optimizer, 
-	# 			learning_rate=lr,
-	# 			loss='categorical_crossentropy',
-	# 			# loss=focal_loss_sigmoid,
-	# 			# loss=focal_loss_softmax,
-	# 			placeholder=placeholder,
-	# 		)
-	# 	print("[{}] Build model with attention_ratio: {}".format(self.__class__.__name__, attention_ratio))
-	# 	print("[{}] Build model with TripletLoss: {}; HardMining: {}".format(self.__class__.__name__, use_triplet, triplet_hard_mining))
-	# 	return x
-
 	def define_network(self, X_images, Y_targets, num_outputs=2, hidden_embedding=512, optimizer='adam', lr=1e-3,
 			use_pooling=True, use_bn=False, attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
 
-		with tf.variable_scope('cnn'):
-			x = self.input_layer(X_images, name='input')
-			x = self.convolution_layer(x, 32, 5, name='conv1', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
-			x = self.max_pooling_layer(x, 2, 'mp1')
-			x = self.convolution_layer(x, 64, 5, name='conv2', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
-			x = self.convolution_layer(x, 64, 3, name='conv3', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
-			x = self.max_pooling_layer(x, 2, 'mp2')
-			x = self.fully_connected_layer(x, 512,'relu', 'fl1')
-			x = self.dropout_layer(x, 'dp1', 0.5)
+		x = self.input_layer(X_images, name='input')
+		x = self.convolution_layer(x, 32, 5, name='conv1', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+		x = self.max_pooling_layer(x, 2, 'mp1')
+		x = self.convolution_layer(x, 64, 5, name='conv2', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+		x = self.convolution_layer(x, 64, 3, name='conv3', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+		x = self.max_pooling_layer(x, 2, 'mp2')
+		x = self.fully_connected_layer(x, 512,'relu', 'fl1')
+		x = self.dropout_layer(x, 'dp1', 0.5)
+		placeholder = tf.placeholder(shape=[None, Y_targets.shape[1]], dtype=tf.float32, name="input_label")
 
-		with tf.variable_scope('fc'):
-			if use_triplet:
-				x = self.fully_connected_layer(x, num_outputs, 'linear', 'fl2')
-			else:
-				x = self.fully_connected_layer(x, num_outputs, 'softmax', 'fl2')
-
-		with tf.variable_scope('loss'):
-			placeholder = tf.placeholder(
-				shape=[None, Y_targets.shape[1]],
-				dtype=tf.float32,
-				name="input_label",
+		if use_triplet:
+			x = self.fully_connected_layer(x, num_outputs, 'linear', 'fl2')
+			loss = batch_hard_triplet_loss if triplet_hard_mining else batch_all_triplet_loss
+			x = regression(
+				x,
+				optimizer=optimizer, 
+				learning_rate=lr,
+				loss=loss,
+				placeholder=placeholder,
 			)
-			if use_triplet:
-				loss = batch_hard_triplet_loss if triplet_hard_mining else batch_all_triplet_loss
-				x = regression(
-					x,
-					optimizer=optimizer, 
-					learning_rate=lr,
-					loss=loss,
-					placeholder=placeholder,
-				)
-			else:
-				x = regression(
-					x,
-					optimizer=optimizer, 
-					learning_rate=lr,
-					loss='categorical_crossentropy',
-					placeholder=placeholder,
-				)
+		else:
+			x = self.fully_connected_layer(x, num_outputs, 'softmax', 'fl2')
+			x = regression(
+				x,
+				optimizer=optimizer, 
+				learning_rate=lr,
+				loss='categorical_crossentropy',
+				placeholder=placeholder,
+			)
 		print("[{}] Build model with attention_ratio: {}".format(self.__class__.__name__, attention_ratio))
 		print("[{}] Build model with TripletLoss: {}; HardMining: {}".format(self.__class__.__name__, use_triplet, triplet_hard_mining))
 		return x
+
+	# def define_network(self, X_images, Y_targets, num_outputs=2, hidden_embedding=512, optimizer='adam', lr=1e-3,
+	# 		use_pooling=True, use_bn=False, attention_ratio=0, use_triplet=False, triplet_hard_mining=False):
+
+	# 	with tf.variable_scope('cnn'):
+	# 		x = self.input_layer(X_images, name='input')
+	# 		x = self.convolution_layer(x, 32, 5, name='conv1', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+	# 		x = self.max_pooling_layer(x, 2, 'mp1')
+	# 		x = self.convolution_layer(x, 64, 5, name='conv2', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+	# 		x = self.convolution_layer(x, 64, 3, name='conv3', activation_type='relu', regularizer='L2', attention_ratio=attention_ratio)
+	# 		x = self.max_pooling_layer(x, 2, 'mp2')
+	# 		x = self.fully_connected_layer(x, 512,'relu', 'fl1')
+	# 		x = self.dropout_layer(x, 'dp1', 0.5)
+
+	# 	with tf.variable_scope('fc'):
+	# 		if use_triplet:
+	# 			x = self.fully_connected_layer(x, num_outputs, 'linear', 'fl2')
+	# 		else:
+	# 			x = self.fully_connected_layer(x, num_outputs, 'softmax', 'fl2')
+
+	# 	with tf.variable_scope('loss'):
+	# 		placeholder = tf.placeholder(
+	# 			shape=[None, Y_targets.shape[1]],
+	# 			dtype=tf.float32,
+	# 			name="input_label",
+	# 		)
+	# 		if use_triplet:
+	# 			loss = batch_hard_triplet_loss if triplet_hard_mining else batch_all_triplet_loss
+	# 			x = regression(
+	# 				x,
+	# 				optimizer=optimizer, 
+	# 				learning_rate=lr,
+	# 				loss=loss,
+	# 				placeholder=placeholder,
+	# 			)
+	# 		else:
+	# 			x = regression(
+	# 				x,
+	# 				optimizer=optimizer, 
+	# 				learning_rate=lr,
+	# 				loss='categorical_crossentropy',
+	# 				placeholder=placeholder,
+	# 			)
+	# 	print("[{}] Build model with attention_ratio: {}".format(self.__class__.__name__, attention_ratio))
+	# 	print("[{}] Build model with TripletLoss: {}; HardMining: {}".format(self.__class__.__name__, use_triplet, triplet_hard_mining))
+	# 	return x
 
 
 #------------------------------------------------------------------------------
