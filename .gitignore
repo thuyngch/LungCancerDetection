@@ -76,3 +76,4 @@ exp/
 .mycommitmsg.txt
 .vscode/
 *.png
+.DS_Store
