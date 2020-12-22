@@ -1,16 +1,9 @@
 # Installation
 
-* Requirements:
+* Create environment:
 ```
-python>=3.6
-CUDA==9.0
-```
-
-* Create pip environment:
-```
-cd ~/.virtualenvs
-virtualenv -p python3.6 lungcancer
-workon lungcancer
+conda create -n lungcancer python=3.6 -y
+conda activate lungcancer
 ```
 
 * Clone Git repository:
@@ -22,9 +15,10 @@ cd LungCancerDetection
 
 * Install required packages:
 ```
-pip install numpy cython opencv-python tqdm scikit-image albumentations pandas pylint sklearn
-pip install ipython jupyter jupyterlab
-pip install tensorflow==1.12 tensorboard==1.12 tflearn tensorflow-gpu==1.12
+conda install cython numpy ipython jupyter jupyterlab -y
+pip install opencv-python tqdm scikit-image albumentations pandas pylint sklearn
+conda install cudatoolkit==9.0 cudnn==7.1.2 tensorflow-gpu==1.12 keras==2.2.4 -y
+pip install tflearn h5py
 ipython kernel install --user --name=lungcancer
 python setup.py develop
 ```
@@ -34,12 +28,4 @@ python setup.py develop
 ipython
 import tensorflow as tf
 sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-```
-
-* Config the VSCode remember the last commit message:
-```
-echo "update" > .mycommitmsg.txt
-git config --local commit.template .mycommitmsg.txt
-printf "`git log -1 --pretty=%s`" > .gitmessage.txt
-chmod +x .git/hooks/post-commit
 ```
