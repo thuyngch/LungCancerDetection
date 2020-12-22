@@ -17,7 +17,7 @@ cd LungCancerDetection
 conda install cython numpy ipython jupyter jupyterlab -y
 pip install opencv-python tqdm scikit-image albumentations pandas pylint sklearn
 conda install cudatoolkit==9.0 cudnn==7.1.2 tensorflow-gpu==1.12 keras==2.2.4 -y
-pip install tflearn h5py gdown
+pip install h5py gdown tflearn==0.3.2
 ipython kernel install --user --name=lungcancer
 python setup.py develop
 ```
