@@ -77,3 +77,6 @@ exp/
 .vscode/
 *.png
 .DS_Store
+
+src/data/*.txt
+src/data/*.h5
