@@ -11,11 +11,12 @@ set -e
 #     --attention_ratio 0.1
 
 python src/models/test.py \
-    --ckpt "./ckpt/attention1.0_softmax_bs8_softsoft/" \
+    --ckpt "ckpt/attention1.0_softmax_bs8_ep50_trainvaltest/" \
     --num_outputs 2 \
-    --hidden_embedding 256 \
+    --hidden_embedding 512 \
     --use_pooling \
-    --attention_ratio 1.0
+    --attention_ratio 1.0\
+    --test_data "src/data/test_s100.h5"
 
 # python src/models/test.py \
 #     --ckpt "./ckpt/attention1.0_softmax_bs8_ep200_triplettest/" \
@@ -30,3 +31,4 @@ python src/models/test.py \
 #     --hidden_embedding 512 \
 #     --use_pooling \
 #     --attention_ratio 1.0
+
