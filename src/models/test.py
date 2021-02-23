@@ -1,13 +1,13 @@
 # ------------------------------------------------------------------------------
 #  Libraries
 # ------------------------------------------------------------------------------
+import pandas as pd
+import csv
 import matplotlib.pyplot as plt
 from cnn_model import CNNModel
 
 import numpy as np
-import pandas as pd
 import tensorflow as tf
-import pickle
 import argparse
 import h5py
 import os
@@ -295,6 +295,13 @@ parser.add_argument('--triplet_hard_mining', action='store_true',
 
 parser.add_argument('--tta', action='store_true',
                     default=False, help='Test time augmentation')
+parser.add_argument('--result_file',
+                    default='./test_result.csv', help='Test time augmentation')
+
+# for saving cvs file only
+parser.add_argument('--lr', help='lr')
+parser.add_argument('--epoch', help='epoch')
+parser.add_argument('--batch_size', help='batch_size')
 
 args = parser.parse_args()
 
@@ -346,5 +353,30 @@ if __name__ == "__main__":
     print("precision: %.6f" % (precision))
     print("recall: %.6f" % (recall))
     print("specificity: %.6f" % (specificity))
-    plot_confusion_matrix(
-        cm, classes=['no-nodule', 'nodule'], title='Confusion matrix')
+
+    # Write to csv file
+    header = ['hidden_embedding', 'lr', 'epoch',
+              'batch_size', 'use_pooling', 'attention_ratio',
+              'Precision', 'Recall', 'Specificity']
+
+    update_data = dict(Precision=[precision],
+                       Recall=[recall],
+                       Specificity=[specificity],
+                       hidden_embedding=[args.hidden_embedding],
+                       lr=[args.lr],
+                       epoch=[args.epoch],
+                       batch_size=[args.batch_size],
+                       use_pooling=[args.use_pooling],
+                       attention_ratio=[args.attention_ratio])
+
+    if not os.path.isfile(args.result_file):
+        header = {x: [] for x in header}
+        df = pd.DataFrame(header)
+        df.to_csv(args.result_file, header=True, index=False)
+
+    df_old = pd.read_csv(args.result_file)
+
+    df_new = pd.DataFrame(update_data)
+    df_new = df_new.append(df_old, ignore_index=True)
+
+    df_new.to_csv(args.result_file, header=True, index=False)
