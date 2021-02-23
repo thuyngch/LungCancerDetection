@@ -28,7 +28,7 @@ neg_img_dir = "/home/thuync/Workspace/Luna16_git/input/extract/neg"
 
 dataset_file = os.path.join("src/data", '{}_datalabels.txt'.format(mode))
 h5_dataset_file = os.path.join("src/data", '{}_dataset.h5'.format(mode))
-h5_file = os.path.join("src/data", '{}_s100.h5'.format(mode))
+h5_file = os.path.join("src/data", '{}_s100_r50.h5'.format(mode))
 
 
 # Get image files
@@ -66,7 +66,7 @@ with open(dataset_file, 'w') as fp:
         fp.writelines(line+'\n')
 
 build_hdf5_image_dataset(
-    dataset_file, image_shape=(100, 100, 1),
+    dataset_file, image_shape=(50, 50, 1),
     mode='file', output_path=h5_dataset_file,
     categorical_labels=True, normalize=True, grayscale=True)
 
@@ -76,7 +76,7 @@ X_images = h5f['X']
 Y_labels = h5f['Y'][:]
 
 print(X_images.shape)
-X_images = X_images[:, :, :].reshape([-1, 100, 100, 1])
+X_images = X_images[:, :, :].reshape([-1, 50, 50, 1])
 print(X_images.shape)
 h5f.close()
 

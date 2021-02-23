@@ -65,6 +65,7 @@ def plot_confusion_matrix(cm, classes, normalize=False,
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
+    plt.figure()
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     # plt.colorbar()
@@ -90,6 +91,9 @@ def plot_confusion_matrix(cm, classes, normalize=False,
     # plt.grid('off')
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    out_file = 'conf_mat.png'
+    plt.savefig(out_file, bbox_inches='tight')
+    print("Confusion matrix is saved at {}".format(out_file))
 
 
 def load_images(filename):
@@ -166,9 +170,9 @@ def get_metrics(Y_test_labels, label_predictions):
     FN = cm[1][0]
     TP = cm[1][1]
 
-    precision = TP*1.0/(TP+FP)
-    recall = TP*1.0/(TP+FN)
-    specificity = TN*1.0/(TN+FP)
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
+    specificity = TN / (TN + FP)
 
     return precision, recall, specificity, cm
 
@@ -185,7 +189,9 @@ def plot_roc_curve(fpr, tpr, roc_auc):
     plt.xlim(0.0, 1.0)
     plt.ylim(0.0, 1.0)
     plt.legend(loc="lower right")
-    plt.savefig('roc.png', bbox_inches='tight')
+    out_file = 'roc.png'
+    plt.savefig(out_file, bbox_inches='tight')
+    print("ROC is saved at {}".format(out_file))
 
 
 # ------------------------------------------------------------------------------
@@ -293,10 +299,7 @@ parser.add_argument('--tta', action='store_true',
 args = parser.parse_args()
 
 # Take arguments
-train_data = args.train_data
-test_data = args.test_data
-ckpt = args.ckpt
-os.makedirs(os.path.dirname(ckpt), exist_ok=True)
+os.makedirs(os.path.dirname(args.ckpt), exist_ok=True)
 
 use_bn = args.use_bn
 num_outputs = args.num_outputs
@@ -314,8 +317,8 @@ tta = args.tta
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
     # Load data
-    X_train_images, Y_train_labels = load_images(train_data)
-    X_test_images, Y_test_labels = load_images(test_data)
+    X_train_images, Y_train_labels = load_images(args.train_data)
+    X_test_images, Y_test_labels = load_images(args.test_data)
 
     # Build model
     convnet = CNNModel()
@@ -326,8 +329,8 @@ if __name__ == "__main__":
         use_triplet=use_triplet, triplet_hard_mining=triplet_hard_mining)
     model = tflearn.DNN(network)
 
-    print("ckpt_dir", ckpt)
-    ckpt = tf.train.latest_checkpoint(ckpt)
+    print("ckpt_dir", args.ckpt)
+    ckpt = tf.train.latest_checkpoint(args.ckpt)
     print("ckpt", ckpt)
     model.load(ckpt)
 
@@ -343,3 +346,5 @@ if __name__ == "__main__":
     print("precision: %.6f" % (precision))
     print("recall: %.6f" % (recall))
     print("specificity: %.6f" % (specificity))
+    plot_confusion_matrix(
+        cm, classes=['no-nodule', 'nodule'], title='Confusion matrix')
